@@ -1,55 +1,62 @@
 'use client';
 
-import { SessionProvider } from "next-auth/react";
 import { createContext, useContext, useEffect, useState } from 'react';
+import { SessionProvider } from 'next-auth/react';
 
 type Theme = 'light' | 'dark';
 
-interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-}
+const ThemeContext = createContext({
+  theme: 'light' as Theme,
+  toggleTheme: () => {},
+});
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-}
-
-export function Providers({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
-    // Check local storage or system preference
+    // Check localStorage first
     const savedTheme = localStorage.getItem('theme') as Theme;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    setTheme(savedTheme || (systemPrefersDark ? 'dark' : 'light'));
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } else {
+      // If no saved preference, check system preference
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(systemPrefersDark ? 'dark' : 'light');
+      if (systemPrefersDark) {
+        document.documentElement.classList.add('dark');
+      }
+    }
   }, []);
 
-  useEffect(() => {
-    // Update document class when theme changes
-    if (theme === 'dark') {
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    localStorage.setItem('theme', newTheme);
   };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <SessionProvider>
-        {children}
-      </SessionProvider>
+      {children}
     </ThemeContext.Provider>
+  );
+}
+
+export const useTheme = () => useContext(ThemeContext);
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider>
+      <ThemeProvider>{children}</ThemeProvider>
+    </SessionProvider>
   );
 } 

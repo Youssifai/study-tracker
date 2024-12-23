@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, BookOpen, Users, LogOut, Sun, Moon } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
+import { Home, BookOpen, Users, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../providers';
 import { useEffect, useState } from 'react';
 
@@ -32,58 +32,61 @@ export default function Sidebar() {
   }, [session]);
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-16 flex flex-col items-center py-8 bg-white dark:bg-gray-800 shadow-lg">
+    <div className="fixed left-0 top-0 h-full w-16 flex flex-col items-center py-8 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
       <div className="flex-1 flex flex-col items-center space-y-4">
         <Link
           href="/dashboard"
-          className={`p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+          className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
             pathname === '/dashboard' ? 'bg-gray-100 dark:bg-gray-700' : ''
           }`}
-          title="Dashboard"
         >
-          <Home className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          <Home className="w-6 h-6 text-gray-600 dark:text-gray-300" />
         </Link>
-
         <Link
           href="/courses"
-          className={`p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+          className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
             pathname === '/courses' ? 'bg-gray-100 dark:bg-gray-700' : ''
           }`}
-          title="Courses"
         >
-          <BookOpen className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          <BookOpen className="w-6 h-6 text-gray-600 dark:text-gray-300" />
         </Link>
-
-        <Link
-          href={groupId ? `/group/${groupId}` : '/group'}
-          className={`p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-            pathname.startsWith('/group') ? 'bg-gray-100 dark:bg-gray-700' : ''
-          }`}
-          title="Group"
-        >
-          <Users className="w-6 h-6 text-gray-700 dark:text-gray-200" />
-        </Link>
+        {groupId ? (
+          <Link
+            href={`/group/${groupId}`}
+            className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+              pathname.startsWith('/group/') ? 'bg-gray-100 dark:bg-gray-700' : ''
+            }`}
+            title="View your group"
+          >
+            <Users className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+          </Link>
+        ) : (
+          <div
+            title="You're not currently in a group. Please join or create one to access this feature."
+            className="p-2 rounded-lg cursor-not-allowed opacity-50"
+          >
+            <Users className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+          </div>
+        )}
       </div>
-
       <div className="flex flex-col items-center space-y-4">
         <button
           onClick={toggleTheme}
-          className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Toggle theme"
         >
-          {theme === 'light' ? (
-            <Moon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          {theme === 'dark' ? (
+            <Sun className="w-6 h-6 text-gray-600 dark:text-gray-300" />
           ) : (
-            <Sun className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            <Moon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
           )}
         </button>
-
         <button
           onClick={() => signOut()}
-          className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title="Logout"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Sign out"
         >
-          <LogOut className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          <LogOut className="w-6 h-6 text-gray-600 dark:text-gray-300" />
         </button>
       </div>
     </div>

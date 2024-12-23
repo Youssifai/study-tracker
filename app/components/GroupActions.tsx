@@ -2,136 +2,138 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import LoadingSpinner from './LoadingSpinner';
+import { Users } from 'lucide-react';
 
 export default function GroupActions() {
-  const [isCreating, setIsCreating] = useState(false);
-  const [isJoining, setIsJoining] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleCreateGroup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!groupName.trim()) {
-      toast.error('Please enter a group name');
-      return;
-    }
+  const handleCreateGroup = async () => {
+    if (!groupName.trim()) return;
+    setIsLoading(true);
+    setError(null);
 
-    setIsCreating(true);
     try {
       const response = await fetch('/api/groups', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: groupName.trim() }),
+        body: JSON.stringify({ name: groupName }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to create group');
+        throw new Error('Failed to create group');
       }
 
-      const group = await response.json();
-      toast.success('Group created successfully!');
-      router.push(`/group/${group.id}`);
-    } catch (error: any) {
+      const data = await response.json();
+      router.push(`/group/${data.id}`);
+    } catch (error) {
       console.error('Error creating group:', error);
-      toast.error(error.message || 'Failed to create group');
+      setError(error instanceof Error ? error.message : 'Failed to create group');
     } finally {
-      setIsCreating(false);
+      setIsLoading(false);
     }
   };
 
-  const handleJoinGroup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inviteCode.trim()) {
-      toast.error('Please enter an invite code');
-      return;
-    }
+  const handleJoinGroup = async () => {
+    if (!inviteCode.trim()) return;
+    setIsLoading(true);
+    setError(null);
 
-    setIsJoining(true);
     try {
       const response = await fetch('/api/groups/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ inviteCode: inviteCode.trim() }),
+        body: JSON.stringify({ inviteCode }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to join group');
+        throw new Error('Failed to join group');
       }
 
-      const group = await response.json();
-      toast.success('Joined group successfully!');
-      router.push(`/group/${group.id}`);
-    } catch (error: any) {
+      const data = await response.json();
+      router.push(`/group/${data.id}`);
+    } catch (error) {
       console.error('Error joining group:', error);
-      toast.error(error.message || 'Failed to join group');
+      setError(error instanceof Error ? error.message : 'Failed to join group');
     } finally {
-      setIsJoining(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="space-y-8 p-6 bg-white rounded-lg shadow-md transform transition-all duration-300 hover:shadow-lg">
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Create a New Group</h2>
-        <form onSubmit={handleCreateGroup} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Enter group name"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              disabled={isCreating}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex justify-center items-center"
-            disabled={isCreating}
-          >
-            {isCreating ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              'Create Group'
-            )}
-          </button>
-        </form>
-      </div>
+    <div className="w-full min-h-[200px] bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-[400px]">
+        <div className="p-5">
+          <div className="flex flex-col items-center gap-4">
+            {/* Icon and Title */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-full">
+                <Users className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+              </div>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                Join or Create a Study Group
+              </h2>
+            </div>
 
-      <div className="border-t pt-8">
-        <h2 className="text-xl font-semibold mb-4">Join a Group</h2>
-        <form onSubmit={handleJoinGroup} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Enter invite code"
-              value={inviteCode}
-              onChange={(e) => setInviteCode(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              disabled={isJoining}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex justify-center items-center"
-            disabled={isJoining}
-          >
-            {isJoining ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              'Join Group'
+            {/* Create Group Section */}
+            <div className="flex flex-col items-center gap-2 w-full">
+              <div className="flex gap-2 w-full">
+                <input
+                  type="text"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Enter group name"
+                  className="flex-1 px-3 py-1.5 text-sm border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <button
+                  onClick={handleCreateGroup}
+                  disabled={isLoading || !groupName.trim()}
+                  className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Create
+                </button>
+              </div>
+
+              <div className="flex items-center w-full my-1">
+                <div className="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+                <span className="px-3 text-xs text-gray-500 dark:text-gray-400">or</span>
+                <div className="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+              </div>
+
+              {/* Join Group Section */}
+              <div className="flex gap-2 w-full">
+                <input
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  placeholder="Enter invite code"
+                  className="flex-1 px-3 py-1.5 text-sm border rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <button
+                  onClick={handleJoinGroup}
+                  disabled={isLoading || !inviteCode.trim()}
+                  className="px-3 py-1.5 text-sm bg-green-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Join
+                </button>
+              </div>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="text-xs text-red-500 dark:text-red-400">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
+          </div>
+        </div>
       </div>
     </div>
   );

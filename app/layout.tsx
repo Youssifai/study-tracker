@@ -1,14 +1,13 @@
-import './globals.css';
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
-import { Providers } from './providers';
-import LayoutWrapper from './components/LayoutWrapper';
+import './globals.css';
+import Providers from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Study Tracker',
-  description: 'Track your study sessions and progress',
+  description: 'Track your study progress and collaborate with peers',
 };
 
 export default function RootLayout({
@@ -17,14 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-          <Toaster position="top-right" />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

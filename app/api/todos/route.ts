@@ -1,59 +1,42 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { prisma } from '@/lib/prisma';
 
-// Create Todo
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized", message: "Please log in" },
-        { status: 401 }
-      );
+    if (!session?.user?.email) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const body = await request.json();
-    console.log('Received todo data:', body);
+    const data = await request.json();
+    console.log('Received todo data:', data);
 
-    // If courseId is provided, verify course ownership
-    if (body.courseId) {
-      const course = await prisma.course.findUnique({
-        where: {
-          id: body.courseId,
-          userId: session.user.id, // Ensure the course belongs to the user
-        },
-      });
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
 
-      if (!course) {
-        return NextResponse.json(
-          { error: "Course not found or unauthorized" },
-          { status: 403 }
-        );
-      }
+    if (!user) {
+      return new NextResponse('User not found', { status: 404 });
     }
 
+    // Create todo with current date
     const todo = await prisma.todo.create({
       data: {
-        userId: session.user.id,
-        title: body.title,
-        date: new Date(body.date),
-        project: body.project || null,
-        priority: body.priority || 'MEDIUM',
-        courseId: body.courseId || null, // Add courseId if provided
+        userId: user.id,
+        title: data.title,
+        date: new Date(), // Set to current date
+        completed: false,
+        priority: data.priority,
+        courseId: data.courseId || null,
       },
     });
 
-    console.log('Created todo:', todo);
-    return NextResponse.json(todo, { status: 201 });
-  } catch (error: any) {
-    console.error("Todo creation error:", error);
-    return NextResponse.json(
-      { error: "Failed to create todo", message: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json(todo);
+  } catch (error) {
+    console.error('Todo creation error:', error);
+    return new NextResponse('Failed to create todo', { status: 500 });
   }
 }
 

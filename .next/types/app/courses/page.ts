@@ -1,8 +1,8 @@
 // File: /Users/joey/Downloads/Projects/studytracker/app/courses/page.tsx
-import * as entry from '../../../../app/courses/page.js'
+import * as entry from '../../../../app/(protected)/courses/page.jsx'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../app/courses/page.js')
+type TEntry = typeof import('../../../../app/(protected)/courses/page.jsx')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

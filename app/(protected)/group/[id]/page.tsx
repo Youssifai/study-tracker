@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Edit2, X, Crown } from 'lucide-react';
+import { Edit2, X, Crown, Users } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 
@@ -41,9 +41,17 @@ interface Group {
   };
 }
 
+interface MemberWithStats {
+  userId: string;
+  userName: string;
+  monthlyTime: number;
+  todayTime: number;
+  isOwner: boolean;
+}
+
 export default function GroupPage({ params }: { params: { id: string } }) {
   const [group, setGroup] = useState<Group | null>(null);
-  const [stats, setStats] = useState<GroupStats | null>(null);
+  const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
@@ -83,7 +91,7 @@ export default function GroupPage({ params }: { params: { id: string } }) {
         throw new Error('Failed to fetch group stats');
       }
       const data = await response.json();
-      setStats(data);
+      setGroupStats(data);
     } catch (error) {
       console.error('Error fetching group stats:', error);
     }
@@ -135,6 +143,17 @@ export default function GroupPage({ params }: { params: { id: string } }) {
     }
   };
 
+  const getMemberWithStats = (member: Member): MemberWithStats => {
+    const stats = groupStats?.memberStats?.find(stat => stat.userId === member.id);
+    return {
+      userId: member.id,
+      userName: member.name,
+      monthlyTime: stats?.monthlyTime || 0,
+      todayTime: stats?.todayTime || 0,
+      isOwner: member.id === group?.ownerId
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -155,103 +174,107 @@ export default function GroupPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="p-6">
-      {/* Group Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {isEditing ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={newGroupName}
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  className="px-3 py-1 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                />
-                <button
-                  onClick={updateGroupName}
-                  className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setNewGroupName(group.name);
-                  }}
-                  className="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{group.name}</h1>
-                {isOwner && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                )}
-              </>
-            )}
+      {/* Centered Group Header */}
+      <div className="mb-8 text-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-full">
+            <Users className="w-8 h-8 text-blue-500 dark:text-blue-400" />
           </div>
-        </div>
-        <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-          Invite Code: <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{group.inviteCode}</span>
+          {isEditing ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                className="px-3 py-1 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              />
+              <button
+                onClick={updateGroupName}
+                className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setNewGroupName(group.name);
+                }}
+                className="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{group.name}</h1>
+              {isOwner && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
+            </div>
+          )}
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            Invite Code: <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{group.inviteCode}</span>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Column - Members List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Members</h2>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {group.members && group.members.length > 0 ? (
-              group.members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-750 group"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-900 dark:text-gray-100">{member.name}</span>
-                    {member.id === group.ownerId && (
-                      <Crown className="w-4 h-4 text-yellow-500" />
+        <div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Members</h2>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {group.members.length > 0 ? (
+                group.members.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between px-4 py-2 group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-900 dark:text-gray-100">{member.name}</span>
+                      {member.id === group.ownerId && (
+                        <Crown className="w-4 h-4 text-yellow-500" />
+                      )}
+                    </div>
+                    {isOwner && member.id !== group.ownerId && (
+                      <button
+                        onClick={() => removeMember(member.id)}
+                        className="p-1 text-gray-500 dark:text-gray-400"
+                      >
+                        <X size={16} />
+                      </button>
                     )}
                   </div>
-                  {isOwner && member.id !== group.ownerId && (
-                    <button
-                      onClick={() => removeMember(member.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="p-4 text-gray-500 dark:text-gray-400">No members found</div>
-            )}
+                ))
+              ) : (
+                <div className="p-4 text-gray-500 dark:text-gray-400">No members found</div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Right Column - Stats and Leaderboard */}
         <div className="space-y-6">
-          {/* Leaderboard */}
+          {/* Monthly Leaderboard */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="p-4 border-b border-gray-100 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Monthly Leaderboard</h2>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {stats?.memberStats
-                ?.sort((a, b) => b.monthlyTime - a.monthlyTime)
+              {group.members
+                .map(getMemberWithStats)
+                .sort((a, b) => b.monthlyTime - a.monthlyTime)
                 .map((stat, index) => (
                   <div
                     key={stat.userId}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-750"
+                    className="flex items-center justify-between px-4 py-3"
                   >
                     <div className="flex items-center gap-3">
                       <span className={`font-semibold w-6 ${
@@ -262,10 +285,13 @@ export default function GroupPage({ params }: { params: { id: string } }) {
                       }`}>
                         {index + 1}.
                       </span>
-                      <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                        {stat.isOwner && <Crown className="w-4 h-4 text-yellow-500" />}
+                      </div>
                     </div>
                     <span className="text-gray-600 dark:text-gray-300 font-medium">
-                      {Math.round(stat.monthlyTime / 60)} hrs
+                      {Math.floor(stat.monthlyTime / 60)}h {Math.round(stat.monthlyTime % 60)}m
                     </span>
                   </div>
               ))}
@@ -278,33 +304,33 @@ export default function GroupPage({ params }: { params: { id: string } }) {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Activity</h2>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {stats?.memberStats
-                ?.filter(stat => stat.todayTime > 0)
+              {group.members
+                .map(getMemberWithStats)
                 .sort((a, b) => b.todayTime - a.todayTime)
-                .map((stat) => (
+                .map((stat, index) => (
                   <div
                     key={stat.userId}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-750"
+                    className="flex items-center justify-between px-4 py-3"
                   >
-                    <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-100 dark:bg-gray-700 rounded-full h-2">
-                        <div
-                          className="bg-blue-500 h-2 rounded-full"
-                          style={{ width: `${Math.min((stat.todayTime / (8 * 60)) * 100, 100)}%` }}
-                        />
-                      </div>
-                      <span className="text-gray-600 dark:text-gray-300 text-sm">
-                        {Math.round(stat.todayTime / 60)} hrs
+                    <div className="flex items-center gap-3">
+                      <span className={`font-semibold w-6 ${
+                        index === 0 ? 'text-yellow-500' :
+                        index === 1 ? 'text-gray-400' :
+                        index === 2 ? 'text-amber-600' :
+                        'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {index + 1}.
                       </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                        {stat.isOwner && <Crown className="w-4 h-4 text-yellow-500" />}
+                      </div>
                     </div>
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">
+                      {Math.floor(stat.todayTime / 60)}h {Math.round(stat.todayTime % 60)}m
+                    </span>
                   </div>
               ))}
-              {(!stats?.memberStats || stats.memberStats.every(stat => stat.todayTime === 0)) && (
-                <div className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                  No study sessions recorded today
-                </div>
-              )}
             </div>
           </div>
         </div>

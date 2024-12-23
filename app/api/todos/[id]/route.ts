@@ -1,7 +1,7 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: Request,
@@ -9,12 +9,40 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const data = await request.json();
+    const todo = await prisma.todo.update({
+      where: { id: params.id },
+      data: { completed: data.completed },
+    });
+
+    return NextResponse.json(todo);
+  } catch (error) {
+    console.error('Error updating todo:', error);
+    return new NextResponse('Failed to update todo', { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+
+    // First verify that the todo belongs to the user
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return new NextResponse('User not found', { status: 404 });
     }
 
     const todo = await prisma.todo.findUnique({
@@ -22,38 +50,21 @@ export async function PATCH(
     });
 
     if (!todo) {
-      return NextResponse.json(
-        { error: "Todo not found" },
-        { status: 404 }
-      );
+      return new NextResponse('Todo not found', { status: 404 });
     }
 
-    if (todo.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+    if (todo.userId !== user.id) {
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { completed, title, date, project, priority } = await request.json();
-
-    const updatedTodo = await prisma.todo.update({
+    // Delete the todo
+    await prisma.todo.delete({
       where: { id: params.id },
-      data: {
-        completed: completed !== undefined ? completed : todo.completed,
-        title: title || todo.title,
-        date: date ? new Date(date) : todo.date,
-        project: project !== undefined ? project : todo.project,
-        priority: priority || todo.priority,
-      },
     });
 
-    return NextResponse.json(updatedTodo);
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("Todo update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update todo" },
-      { status: 500 }
-    );
+    console.error('Error deleting todo:', error);
+    return new NextResponse('Failed to delete todo', { status: 500 });
   }
 } 
