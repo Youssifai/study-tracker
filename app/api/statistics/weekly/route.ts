@@ -6,6 +6,13 @@ import { startOfWeek, endOfWeek, eachDayOfInterval, format, subDays } from 'date
 
 export const dynamic = 'force-dynamic';
 
+interface Session {
+  id: string;
+  startTime: Date;
+  endTime: Date | null;
+  userId: string;
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -45,7 +52,7 @@ export async function GET() {
     });
 
     // Create a map of days with sessions
-    const sessionsMap = new Map();
+    const sessionsMap = new Map<string, Session[]>();
     weekDays.forEach(day => {
       const dayStr = format(day, 'yyyy-MM-dd');
       sessionsMap.set(dayStr, []);
@@ -75,7 +82,6 @@ export async function GET() {
 
     // Calculate current streak
     let currentStreak = 0;
-    let previousDate = new Date();
     const uniqueDates = new Set(
       streakSessions.map(session => 
         format(session.startTime, 'yyyy-MM-dd')
@@ -95,7 +101,7 @@ export async function GET() {
     // Format the response
     const sessions = Array.from(sessionsMap.entries()).map(([date, daySessions]) => ({
       date,
-      totalMinutes: daySessions.reduce((acc, session) => {
+      totalMinutes: daySessions.reduce((acc: number, session: Session) => {
         if (session.endTime) {
           const duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
           return acc + duration;

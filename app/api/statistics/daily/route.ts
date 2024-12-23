@@ -6,6 +6,13 @@ import { startOfDay, endOfDay } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
 
+interface Session {
+  id: string;
+  startTime: Date;
+  endTime: Date | null;
+  userId: string;
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -33,7 +40,7 @@ export async function GET() {
     });
 
     // Calculate total minutes studied today
-    const totalMinutes = todaySessions.reduce((acc, session) => {
+    const totalMinutes = todaySessions.reduce((acc: number, session: Session) => {
       if (session.endTime) {
         const duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
         return acc + duration;

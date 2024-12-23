@@ -1,7 +1,6 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/groups/route": "app/api/groups/route.js",
-  "/api/sessions/[id]/route": "app/api/sessions/[id]/route.js",
   "/api/todos/route": "app/api/todos/route.js",
   "/api/todos/daily/route": "app/api/todos/daily/route.js",
   "/api/courses/route": "app/api/courses/route.js",
