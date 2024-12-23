@@ -1,0 +1,17 @@
+{
+  "/page": "app/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/group/[id]/page": "app/group/[id]/page.js",
+  "/courses/page": "app/courses/page.js",
+  "/api/sessions/[id]/route": "app/api/sessions/[id]/route.js",
+  "/api/todos/route": "app/api/todos/route.js",
+  "/api/statistics/weekly/route": "app/api/statistics/weekly/route.js",
+  "/api/statistics/daily/route": "app/api/statistics/daily/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/groups/route": "app/api/groups/route.js",
+  "/api/groups/[id]/route": "app/api/groups/[id]/route.js",
+  "/api/groups/[id]/stats/route": "app/api/groups/[id]/stats/route.js",
+  "/api/courses/route": "app/api/courses/route.js",
+  "/api/todos/[id]/route": "app/api/todos/[id]/route.js",
+  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js"
+}

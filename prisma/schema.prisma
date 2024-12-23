@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  currentSemester Int?
+  dailyStudyGoal  Int?
+  freeDays        String?
+  groupId         String?
+  group           Group?    @relation("GroupMembers", fields: [groupId], references: [id])
+  ownedGroups     Group[]   @relation("GroupOwner")
+  sessions        Session[]
+  todos           Todo[]
+  courses         Course[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([email])
+  @@index([groupId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  totalTime Int?     // in minutes
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Todo {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  date      DateTime
+  project   String?
+  priority  String   @default("MEDIUM")
+  completed Boolean  @default(false)
+  courseId  String?  // Add optional course reference
+  course    Course?  @relation(fields: [courseId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([courseId])
+  @@index([userId])
+}
+
+model Course {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  examDate  DateTime?
+  groupId   String?
+  group     Group?    @relation(fields: [groupId], references: [id])
+  todos     Todo[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([groupId])
+}
+
+model Group {
+  id        String    @id @default(cuid())
+  name      String
+  inviteCode String   @unique
+  ownerId   String    // Changed from createdByUserId
+  owner     User      @relation("GroupOwner", fields: [ownerId], references: [id])
+  users     User[]    @relation("GroupMembers")
+  courses   Course[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([ownerId])
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
