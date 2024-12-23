@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth-config";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 interface WeeklyStat {
   startTime: Date;
   _sum: {
