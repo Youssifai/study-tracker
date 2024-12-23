@@ -5,7 +5,7 @@ import { Check } from 'lucide-react';
 
 interface StudyStats {
   weeklyProgress: number; // 0-7 days
-  dailyProgress: number; // 0-24 hours
+  dailyProgress: number; // 0-12 hours
   streaks: boolean[]; // last 7 days, true if studied
   totalStudyDays: number;
 }
@@ -30,15 +30,15 @@ export default function StudyProgress() {
         const weeklyData = await weeklyResponse.json();
         const dailyData = await dailyResponse.json();
 
-        // Calculate weekly progress (how many days studied this week)
-        const daysStudied = weeklyData.sessions.filter((day: any) => day.totalMinutes > 0).length;
+        // Calculate weekly progress (days studied this week)
+        const daysStudied = weeklyData.sessions.filter((day: any) => day.hasSession).length;
         
-        // Calculate daily progress (hours studied today)
+        // Calculate daily progress (hours studied today, max 12 hours)
         const todayMinutes = dailyData.totalMinutes || 0;
-        const hoursStudied = todayMinutes / 60;
+        const hoursStudied = Math.min(todayMinutes / 60, 12); // Cap at 12 hours
 
-        // Get streak data for the last 7 days
-        const streakData = weeklyData.sessions.map((day: any) => day.totalMinutes > 0);
+        // Get streak data for the last 7 days (Saturday to Friday)
+        const streakData = weeklyData.sessions.map((day: any) => day.hasSession);
 
         setStats({
           weeklyProgress: daysStudied,
@@ -61,9 +61,10 @@ export default function StudyProgress() {
   }
 
   const weeklyPercentage = (stats.weeklyProgress / 7) * 100;
-  const dailyPercentage = (stats.dailyProgress / 24) * 100;
+  const dailyPercentage = (stats.dailyProgress / 12) * 100; // Changed to 12 hours
 
-  const days = ['THU', 'FRI', 'SAT', 'SUN', 'MON', 'TUE', 'WED'];
+  // Days ordered from Saturday to Friday
+  const days = ['SAT', 'SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI'];
 
   return (
     <div className="space-y-6">
@@ -84,7 +85,7 @@ export default function StudyProgress() {
 
         <div>
           <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
-            <span>Day: {stats.dailyProgress.toFixed(1)}/24</span>
+            <span>Day: {stats.dailyProgress.toFixed(1)}/12</span>
             <span>{Math.round(dailyPercentage)}%</span>
           </div>
           <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">

@@ -2,15 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { startOfDay, endOfDay } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
-
-interface DailyStat {
-  startTime: Date;
-  _sum: {
-    totalTime: number | null;
-  };
-}
 
 export async function GET() {
   try {
@@ -23,36 +17,34 @@ export async function GET() {
       );
     }
 
-    // Get last 7 days of statistics
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const today = new Date();
+    const startOfToday = startOfDay(today);
+    const endOfToday = endOfDay(today);
 
-    const dailyStats = await prisma.session.groupBy({
-      by: ['startTime'],
+    // Get all sessions for today
+    const todaySessions = await prisma.session.findMany({
       where: {
         userId: session.user.id,
         startTime: {
-          gte: sevenDaysAgo,
+          gte: startOfToday,
+          lte: endOfToday,
         },
-        endTime: {
-          not: null,
-        },
-      },
-      _sum: {
-        totalTime: true,
       },
     });
 
-    const formattedStats = dailyStats.map((stat: DailyStat) => ({
-      date: new Date(stat.startTime).toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      }),
-      totalMinutes: stat._sum.totalTime || 0,
-    }));
+    // Calculate total minutes studied today
+    const totalMinutes = todaySessions.reduce((acc, session) => {
+      if (session.endTime) {
+        const duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
+        return acc + duration;
+      }
+      return acc;
+    }, 0);
 
-    return NextResponse.json(formattedStats);
+    return NextResponse.json({
+      totalMinutes,
+      sessions: todaySessions,
+    });
   } catch (error) {
     console.error("Daily statistics error:", error);
     return NextResponse.json(
