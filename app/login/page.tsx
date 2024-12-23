@@ -1,10 +1,10 @@
 'use client';
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(
@@ -79,5 +79,32 @@ export default function LoginPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+function LoginLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-pulse space-y-4 w-full max-w-md p-4">
+        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+        <div className="h-10 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginForm />
+    </Suspense>
   );
 }
