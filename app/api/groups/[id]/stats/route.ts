@@ -35,23 +35,26 @@ export async function GET(
       );
     }
 
-    // Get the last 30 days of study sessions for all group members
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
     // Get all group members
     const groupMembers = await prisma.user.findMany({
       where: { groupId: params.id },
       select: { id: true, name: true },
     });
 
+    // Get today's start and end time
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
     // Get study time per member
     const memberStats = await Promise.all(
-      groupMembers.map(async (member: GroupMember) => {
-        const sessions = await prisma.session.aggregate({
+      groupMembers.map(async (member) => {
+        // Get today's study time
+        const todayStats = await prisma.session.aggregate({
           where: {
             userId: member.id,
-            startTime: { gte: thirtyDaysAgo },
+            startTime: { gte: todayStart, lte: todayEnd },
             endTime: { not: null },
           },
           _sum: {
@@ -62,36 +65,20 @@ export async function GET(
         return {
           userId: member.id,
           userName: member.name,
-          totalMinutes: sessions._sum.totalTime || 0,
+          todayTime: todayStats._sum.totalTime || 0,
         };
       })
     );
 
-    // Sort by total study time (descending)
-    const leaderboard = memberStats.sort((a, b) => b.totalMinutes - a.totalMinutes);
+    // Sort by today's study time (descending)
+    const leaderboard = memberStats.sort((a, b) => b.todayTime - a.todayTime);
 
-    // Get daily group totals
-    const dailyStats = await prisma.session.groupBy({
-      by: ['startTime'],
-      where: {
-        user: {
-          groupId: params.id,
-        },
-        startTime: { gte: thirtyDaysAgo },
-        endTime: { not: null },
-      },
-      _sum: {
-        totalTime: true,
-      },
-    });
-
-    // Calculate group totals
-    const totalMinutes = memberStats.reduce((sum, member) => sum + member.totalMinutes, 0);
+    // Calculate group totals for today
+    const totalMinutes = memberStats.reduce((sum, member) => sum + member.todayTime, 0);
     const averageMinutesPerMember = Math.round(totalMinutes / memberStats.length);
 
     return NextResponse.json({
-      leaderboard,
-      dailyStats,
+      memberStats: leaderboard,
       groupTotals: {
         totalMinutes,
         averageMinutesPerMember,
