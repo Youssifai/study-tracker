@@ -62,6 +62,9 @@ export async function GET(request: Request) {
           gte: startDate,
           lte: endDate
         }
+      },
+      include: {
+        course: true
       }
     });
 

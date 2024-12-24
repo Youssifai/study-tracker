@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Check, X, ChevronUp, ChevronDown, Flag, Book } from 'lucide-react';
+import { useTheme } from '@/app/providers/theme-provider';
 import LoadingSpinner from './LoadingSpinner';
 
 interface Todo {
@@ -28,6 +29,7 @@ const priorityColors = {
 } as const;
 
 export default function TodoList() {
+  const { theme } = useTheme();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState({
     title: '',
@@ -39,6 +41,12 @@ export default function TodoList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
+
+  const priorityColorsTheme = {
+    LOW: theme === 'blue-dark' ? 'text-[rgb(157,178,255)]' : priorityColors.LOW,
+    MEDIUM: theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : priorityColors.MEDIUM,
+    HIGH: theme === 'blue-dark' ? 'text-[rgb(67,83,255)]' : priorityColors.HIGH
+  } as const;
 
   useEffect(() => {
     fetchTodos();
@@ -156,21 +164,37 @@ export default function TodoList() {
             value={newTodo.title}
             onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
             placeholder="Add a new task..."
-            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
+            className={`flex-1 px-3 py-2 bg-black/40 border rounded-lg text-white placeholder-white-300/50 focus:outline-none ${
+              theme === 'blue-dark' 
+                ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(111,142,255)]/50'
+                : 'border-purple-500/20 focus:border-purple-500/50'
+            }`}
           />
-          <div className="flex items-center gap-1 px-2 bg-black/40 border border-purple-500/20 rounded-lg">
+          <div className={`flex items-center gap-1 px-2 bg-black/40 border rounded-lg ${
+            theme === 'blue-dark'
+              ? 'border-[rgb(111,142,255)]/20'
+              : 'border-purple-500/20'
+          }`}>
             <button
               type="button"
               onClick={() => handlePriorityChange('up')}
-              className="p-1 text-purple-400 hover:text-pink-500 transition-colors"
+              className={`p-1 transition-colors ${
+                theme === 'blue-dark'
+                  ? 'text-[rgb(111,142,255)] hover:text-[rgb(111,142,255)]/80'
+                  : 'text-purple-400 hover:text-pink-500'
+              }`}
             >
               <ChevronUp size={16} />
             </button>
-            <Flag className={priorityColors[newTodo.priority]} size={16} />
+            <Flag className={priorityColorsTheme[newTodo.priority]} size={16} />
             <button
               type="button"
               onClick={() => handlePriorityChange('down')}
-              className="p-1 text-purple-400 hover:text-pink-500 transition-colors"
+              className={`p-1 transition-colors ${
+                theme === 'blue-dark'
+                  ? 'text-[rgb(111,142,255)] hover:text-[rgb(111,142,255)]/80'
+                  : 'text-purple-400 hover:text-pink-500'
+              }`}
             >
               <ChevronDown size={16} />
             </button>
@@ -182,12 +206,20 @@ export default function TodoList() {
             value={newTodo.tag}
             onChange={(e) => setNewTodo({ ...newTodo, tag: e.target.value })}
             placeholder="Tag (e.g., homework, exam)"
-            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
+            className={`flex-1 px-3 py-2 bg-black/40 border rounded-lg text-white placeholder-white-300/50 focus:outline-none ${
+              theme === 'blue-dark' 
+                ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(157,178,255)]/50'
+                : 'border-purple-500/20 focus:border-purple-500/50'
+            }`}
           />
           <select
             value={newTodo.courseId}
             onChange={(e) => setNewTodo({ ...newTodo, courseId: e.target.value })}
-            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
+            className={`flex-1 px-3 py-2 bg-black/40 border rounded-lg text-white focus:outline-none ${
+              theme === 'blue-dark' 
+                ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(157,178,255)]/50'
+                : 'border-purple-500/20 focus:border-purple-500/50'
+            }`}
           >
             {courses.map(course => (
               <option key={course.id} value={course.id} className="bg-black text-white">
@@ -197,7 +229,11 @@ export default function TodoList() {
           </select>
           <button
             type="submit"
-            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all shadow-md hover:shadow-lg"
+            className={`px-6 py-2 text-white rounded-lg transition-all shadow-md hover:shadow-lg ${
+              theme === 'blue-dark'
+                ? 'bg-[#6b8bfb] hover:bg-[#6b8bfb]/90'
+                : 'bg-purple-600 hover:bg-purple-700'
+            }`}
           >
             Add
           </button>
@@ -205,54 +241,66 @@ export default function TodoList() {
       </form>
 
       <div className="space-y-2">
-        {todos.map((todo) => {
-          const course = courses.find(c => c.id === todo.courseId);
-          return (
-            <div
-              key={todo.id}
-              className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-purple-500/20 group backdrop-blur-sm"
+        {todos.map(todo => (
+          <div
+            key={todo.id}
+            className={`flex items-center gap-3 p-3 bg-black/40 border rounded-lg ${
+              theme === 'blue-dark'
+                ? 'border-[rgb(111,142,255)]/20'
+                : 'border-purple-500/20'
+            }`}
+          >
+            <button
+              onClick={() => toggleTodo(todo.id)}
+              className={`p-1 rounded-full transition-colors ${
+                todo.completed
+                  ? theme === 'blue-dark'
+                    ? 'bg-[rgb(111,142,255)] text-white'
+                    : 'bg-purple-500 text-white'
+                  : theme === 'blue-dark'
+                  ? 'border border-[rgb(111,142,255)]/20 text-[rgb(111,142,255)] hover:bg-[rgb(111,142,255)]/10'
+                  : 'border border-purple-500/20 text-purple-400 hover:bg-purple-500/10'
+              }`}
             >
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => toggleTodo(todo.id)}
-                  className={`p-1 rounded-md transition-colors ${
-                    todo.completed
-                      ? 'bg-purple-500/20 text-pink-500'
-                      : 'hover:bg-purple-500/10 text-purple-400'
-                  }`}
-                >
-                  <Check size={16} className={todo.completed ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'} />
-                </button>
-                <div className={`flex flex-col ${todo.completed ? 'text-purple-500/50' : 'text-white'}`}>
-                  <span className="text-sm">{todo.title}</span>
-                  <div className="flex items-center gap-2 text-xs">
-                    {todo.tag && (
-                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">
-                        {todo.tag}
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Flag className={`${priorityColors[todo.priority]} w-3 h-3`} />
-                      {course && (
-                        <span className="text-purple-400 flex items-center gap-1">
-                          <Book size={12} />
-                          {course.name}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+              <Check size={14} />
+            </button>
+            <div className="flex-1">
+              <div className={`font-medium ${todo.completed ? 'line-through opacity-50' : ''}`}>
+                {todo.title}
               </div>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="opacity-0 group-hover:opacity-100 p-1 text-purple-400 hover:text-pink-500 transition-colors"
-              >
-                <X size={16} />
-              </button>
+              <div className="flex items-center gap-2 mt-1">
+                {todo.courseId && (
+                  <div className={`flex items-center gap-1 text-sm ${
+                    theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'
+                  }`}>
+                    <Book size={12} />
+                    <span>{courses.find(c => c.id === todo.courseId)?.name}</span>
+                  </div>
+                )}
+                {todo.tag && (
+                  <div className={`flex items-center gap-1 text-sm ${
+                    theme === 'blue-dark' ? 'text-[#6b8bfb]/70' : 'text-purple-400/70'
+                  }`}>
+                    <span>•</span>
+                    <span>#{todo.tag}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          );
-        })}
+            <Flag className={priorityColorsTheme[todo.priority]} size={14} />
+            <button
+              onClick={() => deleteTodo(todo.id)}
+              className={`p-1 rounded-full transition-colors ${
+                theme === 'blue-dark'
+                  ? 'text-[rgb(111,142,255)] hover:text-[rgb(111,142,255)]/80'
+                  : 'text-purple-400 hover:text-pink-500'
+              }`}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
-} 
+}

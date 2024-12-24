@@ -164,7 +164,7 @@ export default function GroupPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h2 className="text-2xl font-semibold text-white mb-4">Error</h2>
-        <p className="text-purple-300">{error || 'Failed to load group'}</p>
+        <p className="text-[rgb(157,178,255)]/70">{error || 'Failed to load group'}</p>
       </div>
     );
   }
@@ -174,7 +174,7 @@ export default function GroupPage() {
   return (
     <div className="relative min-h-screen bg-black">
       {/* Background Glow Effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[rgb(111,142,255)]/20 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto p-8">
         {/* Header */}
@@ -186,11 +186,11 @@ export default function GroupPage() {
                   type="text"
                   value={newGroupName}
                   onChange={(e) => setNewGroupName(e.target.value)}
-                  className="px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
+                  className="px-3 py-2 bg-black/40 border border-[rgb(111,142,255)]/20 rounded-lg text-white focus:outline-none focus:border-[rgb(111,142,255)]/50"
                 />
                 <button
                   onClick={updateGroupName}
-                  className="px-3 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all"
+                  className="px-3 py-2 bg-[rgb(157,178,255)] hover:bg-[rgb(157,178,255)]/90 text-white rounded-lg transition-all"
                 >
                   Save
                 </button>
@@ -199,20 +199,20 @@ export default function GroupPage() {
                     setIsEditing(false);
                     setNewGroupName(group.name);
                   }}
-                  className="px-3 py-2 text-purple-300 hover:text-pink-500"
+                  className="px-3 py-2 text-[rgb(157,178,255)]/70 hover:text-[rgb(157,178,255)]"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
               <>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-[rgb(157,178,255)]">
                   {group.name}
                 </h1>
                 {isOwner && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-1 text-purple-300 hover:text-pink-500 transition-colors"
+                    className="p-1 text-[rgb(157,178,255)]/70 hover:text-[rgb(157,178,255)] transition-colors"
                   >
                     <Pencil size={20} />
                   </button>
@@ -222,7 +222,7 @@ export default function GroupPage() {
           </div>
           <button
             onClick={handleLeaveGroup}
-            className="px-4 py-2 bg-black/40 border border-purple-500/20 text-purple-300 hover:text-pink-500 rounded-lg transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-black/40 border border-[rgb(111,142,255)]/20 text-[rgb(157,178,255)]/70 hover:text-[rgb(157,178,255)] rounded-lg transition-all flex items-center gap-2"
           >
             <UserMinus size={20} />
             Leave Group
@@ -230,38 +230,40 @@ export default function GroupPage() {
         </div>
 
         {/* Invite Code Section */}
-        <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 mb-8 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+        <div className="bg-black/40 border border-[rgb(111,142,255)]/20 backdrop-blur-sm rounded-lg p-6 mb-8 shadow-[0_0_15px_rgba(111,142,255,0.15)]">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white mb-2">Invite Code</h2>
-              <p className="text-purple-300">Share this code with others to invite them to your group</p>
+              <p className="text-[rgb(157,178,255)]/70">Share this code with others to invite them to your group</p>
             </div>
             <button
               onClick={handleCopyInviteCode}
-              className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(236,72,153,0.3)]"
+              className={`px-4 py-2 text-white rounded-lg transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(107,139,251,0.3)] ${
+                'bg-[#6b8bfb] hover:bg-[#6b8bfb]/90'
+              }`}
             >
               {copied ? <Check size={20} /> : <Copy size={20} />}
               {copied ? 'Copied!' : 'Copy Code'}
             </button>
           </div>
-          <div className="mt-4 p-3 bg-black/40 border border-purple-500/20 rounded-lg">
-            <code className="text-pink-500 font-mono">{group.inviteCode}</code>
+          <div className="mt-4 p-3 bg-black/40 border border-[rgb(111,142,255)]/20 rounded-lg">
+            <code className="text-[rgb(157,178,255)] font-mono">{group.inviteCode}</code>
           </div>
         </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column - Members */}
-          <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+          <div className="bg-black/40 border border-[rgb(111,142,255)]/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(111,142,255,0.15)]">
             <div className="flex items-center gap-3 mb-6">
-              <Users className="w-6 h-6 text-pink-500" />
+              <Users className="w-6 h-6 text-[rgb(157,178,255)]" />
               <h2 className="text-xl font-semibold text-white">Group Members</h2>
             </div>
             <div className="grid gap-4">
               {group.members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg group"
+                  className="flex items-center justify-between p-4 bg-black/40 border border-[rgb(111,142,255)]/20 rounded-lg group"
                 >
                   <div className="flex items-center gap-4">
                     {member.image ? (
@@ -271,8 +273,8 @@ export default function GroupPage() {
                         className="w-10 h-10 rounded-full"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
-                        <span className="text-pink-500 font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-[rgb(157,178,255)]/20 flex items-center justify-center">
+                        <span className="text-[rgb(157,178,255)]">
                           {member.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -280,14 +282,14 @@ export default function GroupPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-white">{member.name}</h3>
                       {member.id === group.ownerId && (
-                        <Crown className="w-4 h-4 text-pink-500" />
+                        <Crown className="w-4 h-4 text-[rgb(157,178,255)]" />
                       )}
                     </div>
                   </div>
                   {isOwner && member.id !== group.ownerId && (
                     <button
                       onClick={() => handleKickMember(member.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-purple-300 hover:text-pink-500 transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1 text-[rgb(157,178,255)]/70 hover:text-[rgb(157,178,255)] transition-all"
                     >
                       <X size={20} />
                     </button>
@@ -300,21 +302,21 @@ export default function GroupPage() {
           {/* Right Column - Stats */}
           <div className="space-y-8">
             {/* Monthly Leaderboard */}
-            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+            <div className="bg-black/40 border border-[rgb(111,142,255)]/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(111,142,255,0.15)]">
               <h2 className="text-xl font-semibold text-white mb-6">Monthly Leaderboard</h2>
               <div className="space-y-4">
                 {groupStats?.monthlyStats.map((stat, index) => (
                   <div
                     key={stat.userId}
-                    className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-black/40 border border-[rgb(111,142,255)]/20 rounded-lg"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-white">{stat.userName}</span>
                       {index === 0 && stat.monthlyTime > 0 && (
-                        <Crown className="w-4 h-4 text-pink-500" />
+                        <Crown className="w-4 h-4 text-[rgb(157,178,255)]" />
                       )}
                     </div>
-                    <div className="text-purple-300">
+                    <div className="text-[rgb(157,178,255)]/70">
                       {Math.floor(stat.monthlyTime / 60)}h {Math.round(stat.monthlyTime % 60)}m
                     </div>
                   </div>
@@ -323,21 +325,21 @@ export default function GroupPage() {
             </div>
 
             {/* Today's Activity */}
-            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+            <div className="bg-black/40 border border-[rgb(111,142,255)]/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(111,142,255,0.15)]">
               <h2 className="text-xl font-semibold text-white mb-6">Today's Activity</h2>
               <div className="space-y-4">
                 {groupStats?.todayStats.map((stat, index) => (
                   <div
                     key={stat.userId}
-                    className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-black/40 border border-[rgb(111,142,255)]/20 rounded-lg"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-white">{stat.userName}</span>
                       {index === 0 && stat.todayTime > 0 && (
-                        <Crown className="w-4 h-4 text-pink-500" />
+                        <Crown className="w-4 h-4 text-[rgb(157,178,255)]" />
                       )}
                     </div>
-                    <div className="text-purple-300">
+                    <div className="text-[rgb(157,178,255)]/70">
                       {Math.floor(stat.todayTime / 60)}h {Math.round(stat.todayTime % 60)}m
                     </div>
                   </div>
@@ -349,4 +351,4 @@ export default function GroupPage() {
       </div>
     </div>
   );
-} 
+}

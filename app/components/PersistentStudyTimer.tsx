@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { Play, Square, Clock, Pause, AlertCircle } from 'lucide-react';
 import { useTimer } from 'react-timer-hook';
 import { toast } from 'react-hot-toast';
+import { useTheme } from '@/app/providers/theme-provider';
 
 // Constants for localStorage keys and timer settings
 const STORAGE_KEY = 'study_session_data';
@@ -37,6 +38,7 @@ interface TimerState {
 export default function PersistentStudyTimer() {
   // Session management
   const { data: session } = useSession();
+  const { theme } = useTheme();
   const [activeSession, setActiveSession] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [totalPausedTime, setTotalPausedTime] = useState(0);
@@ -436,88 +438,126 @@ export default function PersistentStudyTimer() {
   };
 
   return (
-    <div className="bg-black/60 rounded-xl shadow-lg border border-purple-500/20 overflow-hidden backdrop-blur-sm">
-      <div className="p-6">
-        <div className="flex flex-col items-center space-y-6">
-          {/* Title with Badge */}
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-              Focus Timer
-            </h2>
-            <span className="px-2 py-1 text-xs font-semibold bg-purple-900/30 text-purple-300 rounded-full border border-purple-500/20">
-              Persistent
-            </span>
-          </div>
+    <div className={`p-6 rounded-xl border backdrop-blur-sm ${
+      theme === 'blue-dark'
+        ? 'border-[rgb(111,142,255)]/20 bg-black/60'
+        : 'border-purple-500/20 bg-black/60'
+    }`}>
+      <div className="flex flex-col items-center space-y-6">
+        {/* Title with Badge */}
+        <div className="flex items-center gap-3">
+          <h2 className={`text-xl font-bold ${
+            theme === 'blue-dark'
+              ? 'text-[#6b8bfb]'
+              : 'bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent'
+          }`}>
+            Focus Timer
+          </h2>
+          <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${
+            theme === 'blue-dark'
+              ? 'bg-[#6b8bfb]/30 text-[#6b8bfb] border-[#6b8bfb]/20'
+              : 'bg-purple-500/30 text-purple-300 border-purple-500/20'
+          }`}>
+            Persistent
+          </span>
+        </div>
 
-          {/* Timer Display */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-purple-500/10 rounded-full blur-xl"></div>
-            <div className="relative bg-black/40 rounded-2xl shadow-inner p-6 min-w-[240px] border border-purple-500/20">
-              <div className="flex items-center justify-center gap-3">
-                <Clock className="w-8 h-8 text-pink-500" />
-                <span className="text-4xl font-mono font-bold text-purple-200 tabular-nums">
-                  {formatTime(displaySeconds)}
-                </span>
-              </div>
+        {/* Timer Display */}
+        <div className="relative">
+          <div className={`absolute inset-0 rounded-full blur-xl ${
+            theme === 'blue-dark'
+              ? 'bg-[#6b8bfb]/10'
+              : 'bg-purple-500/10'
+          }`}></div>
+          <div className={`relative bg-black/40 rounded-2xl shadow-inner p-6 min-w-[240px] border ${
+            theme === 'blue-dark'
+              ? 'border-[#6b8bfb]/20'
+              : 'border-purple-500/20'
+          }`}>
+            <div className="flex items-center justify-center gap-3">
+              <Clock className={theme === 'blue-dark' ? 'w-8 h-8 text-[#6b8bfb]' : 'w-8 h-8 text-purple-400'} />
+              <span className={`text-4xl font-mono font-bold tabular-nums ${
+                theme === 'blue-dark'
+                  ? 'text-[#6b8bfb]'
+                  : 'text-purple-400'
+              }`}>
+                {formatTime(displaySeconds)}
+              </span>
             </div>
           </div>
+        </div>
 
-          {/* Error Message */}
-          {timerState.error && (
-            <div className="flex items-center gap-2 text-red-500 bg-black/40 px-4 py-2 rounded-lg border border-purple-500/20">
-              <AlertCircle size={16} />
-              <span className="text-sm font-medium">{timerState.error}</span>
-            </div>
-          )}
+        {/* Error Message */}
+        {timerState.error && (
+          <div className={`flex items-center gap-2 text-red-500 bg-black/40 px-4 py-2 rounded-lg border ${
+            theme === 'blue-dark'
+              ? 'border-[#6b8bfb]/20'
+              : 'border-purple-500/20'
+          }`}>
+            <AlertCircle size={16} className={theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'} />
+            <span className="text-sm font-medium">{timerState.error}</span>
+          </div>
+        )}
 
-          {/* Controls */}
-          <div className="flex gap-4">
-            {!activeSession ? (
+        {/* Controls */}
+        <div className="flex gap-4">
+          {!activeSession ? (
+            <button
+              onClick={handleStartSession}
+              disabled={timerState.isLoading}
+              className={`flex items-center gap-2 px-6 py-3 text-white rounded-xl transition-all shadow-md hover:shadow-lg ${
+                theme === 'blue-dark'
+                  ? 'bg-[#6b8bfb] hover:bg-[#6b8bfb]/90'
+                  : 'bg-pink-500 hover:bg-pink-600'
+              } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <Play size={20} className={theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'} />
+              <span className="font-medium">{timerState.isLoading ? 'Starting...' : 'Start Focus Session'}</span>
+            </button>
+          ) : (
+            <>
               <button
-                onClick={handleStartSession}
+                onClick={handleTogglePause}
                 disabled={timerState.isLoading}
-                className={`flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md hover:shadow-lg ${
-                  timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg font-medium ${
+                  isPaused 
+                    ? theme === 'blue-dark'
+                      ? 'bg-[#6b8bfb] hover:bg-[#6b8bfb]/90 text-white'
+                      : 'bg-pink-500 hover:bg-pink-600 text-white'
+                    : theme === 'blue-dark'
+                    ? 'bg-[#6b8bfb]/30 hover:bg-[#6b8bfb]/40 text-white'
+                    : 'bg-purple-500/30 hover:bg-purple-500/40 text-white'
+                } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <Play size={20} className="animate-pulse" />
-                <span className="font-medium">{timerState.isLoading ? 'Starting...' : 'Start Focus Session'}</span>
+                {isPaused ? <Play size={20} className={theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'} /> : <Pause size={20} className={theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'} />}
+                <span>{isPaused ? 'Resume Focus' : 'Take a Break'}</span>
               </button>
-            ) : (
-              <>
-                <button
-                  onClick={handleTogglePause}
-                  disabled={timerState.isLoading}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg font-medium 
-                    ${isPaused 
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-                      : 'bg-purple-900/30 hover:bg-purple-900/40 text-white'
-                    } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isPaused ? <Play size={20} /> : <Pause size={20} />}
-                  <span>{isPaused ? 'Resume Focus' : 'Take a Break'}</span>
-                </button>
-                <button
-                  onClick={handleEndSession}
-                  disabled={timerState.isLoading}
-                  className={`flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md hover:shadow-lg font-medium ${
-                    timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <Square size={20} />
-                  <span>{timerState.isLoading ? 'Ending...' : 'End Session'}</span>
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Session Status */}
-          {activeSession && (
-            <div className="text-sm text-purple-300 font-medium">
-              {isPaused ? 'Session Paused' : 'Focus Session in Progress'}
-            </div>
+              <button
+                onClick={handleEndSession}
+                disabled={timerState.isLoading}
+                className={`flex items-center gap-2 px-6 py-3 text-white rounded-xl transition-all shadow-md hover:shadow-lg font-medium ${
+                  theme === 'blue-dark'
+                    ? 'bg-[#6b8bfb] hover:bg-[#6b8bfb]/90'
+                    : 'bg-pink-500 hover:bg-pink-600'
+                } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <Square size={20} className={theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-400'} />
+                <span>{timerState.isLoading ? 'Ending...' : 'End Session'}</span>
+              </button>
+            </>
           )}
         </div>
+
+        {/* Session Status */}
+        {activeSession && (
+          <div className={`text-sm font-medium ${
+            theme === 'blue-dark'
+              ? 'text-[#6b8bfb]'
+              : 'text-purple-300'
+          }`}>
+            {isPaused ? 'Session Paused' : 'Focus Session in Progress'}
+          </div>
+        )}
       </div>
     </div>
   );

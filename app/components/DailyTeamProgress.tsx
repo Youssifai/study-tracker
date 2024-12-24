@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Check, Circle } from 'lucide-react';
+import { useTheme } from '@/app/providers/theme-provider';
 import LoadingSpinner from './LoadingSpinner';
 
 interface Todo {
@@ -9,6 +10,11 @@ interface Todo {
   title: string;
   completed: boolean;
   userId: string;
+  tag?: string;
+  course?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface User {
@@ -23,12 +29,18 @@ interface DailyProgress {
 }
 
 export default function DailyTeamProgress() {
+  const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dailyProgress, setDailyProgress] = useState<DailyProgress | null>(null);
 
   useEffect(() => {
     fetchDailyProgress();
+
+    // Set up polling for real-time updates
+    const interval = setInterval(fetchDailyProgress, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDailyProgress = async () => {
@@ -63,7 +75,9 @@ export default function DailyTeamProgress() {
 
   if (error || !dailyProgress) {
     return (
-      <div className="text-pink-500 p-6 text-center">
+      <div className={`p-6 text-center ${
+        theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-pink-500'
+      }`}>
         {error || 'Failed to load daily progress'}
       </div>
     );
@@ -74,7 +88,9 @@ export default function DailyTeamProgress() {
       {dailyProgress.users.map((user) => (
         <div
           key={user.id}
-          className="bg-black/40 rounded-lg p-4 border border-purple-500/20 backdrop-blur-sm transition-all duration-200"
+          className={`bg-black/40 rounded-lg p-4 border backdrop-blur-sm transition-all duration-200 ${
+            theme === 'blue-dark' ? 'border-[rgb(111,142,255)]/20' : 'border-purple-500/20'
+          }`}
         >
           <h3 className="font-medium text-white mb-4 text-center">
             {user.name}
@@ -88,24 +104,37 @@ export default function DailyTeamProgress() {
                   className="flex items-start gap-3 text-sm group"
                 >
                   {todo.completed ? (
-                    <Check className="w-5 h-5 text-pink-500 mt-0.5 flex-shrink-0" />
+                    <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                      theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-pink-500'
+                    }`} />
                   ) : (
-                    <Circle className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                    <Circle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                      theme === 'blue-dark' ? 'text-[rgb(111,142,255)]/50' : 'text-purple-400'
+                    }`} />
                   )}
                   <span
-                    className={`${
+                    className={
                       todo.completed
-                        ? 'line-through text-purple-400'
-                        : 'text-purple-300'
-                    } break-words`}
+                        ? `line-through ${theme === 'blue-dark' ? 'text-[#6b8bfb]/50' : 'text-purple-400'}`
+                        : theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-300'
+                    }
                   >
                     {todo.title}
+                    {(todo.course || todo.tag) && (
+                      <span className="ml-2 text-xs opacity-70">
+                        {todo.course?.name}
+                        {todo.course && todo.tag && " • "}
+                        {todo.tag && `#${todo.tag}`}
+                      </span>
+                    )}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-purple-400 text-center italic">
+            <p className={`text-sm text-center italic ${
+              theme === 'blue-dark' ? 'text-[rgb(111,142,255)]/70' : 'text-purple-400'
+            }`}>
               No tasks for today
             </p>
           )}

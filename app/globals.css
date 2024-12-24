@@ -2,39 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme Styles */
-:root {
-  --background: theme('colors.blue.50');
-  --text-primary: theme('colors.blue.900');
-  --text-secondary: theme('colors.blue.700');
-  --accent: theme('colors.blue.500');
-  --accent-hover: theme('colors.blue.600');
-  --border: theme('colors.blue.200');
-  --card-bg: theme('colors.white');
-}
-
 /* Blue Dark Theme */
-.theme-grey-dark {
+.theme-blue-dark {
   --background: theme('colors.blue.900');
-  --text-primary: theme('colors.white');
+  --text-primary: rgb(111, 142, 255);
   --text-secondary: theme('colors.white/70');
   --accent: theme('colors.blue.600');
   --accent-hover: theme('colors.blue.700');
   --border: theme('colors.blue.500/20');
   --card-bg: theme('colors.blue.800');
-  --glow-color: rgba(0,123,255,0.15);
+  --glow-color: rgba(41, 58, 247, 0.2);
   --highlight: theme('colors.blue.400');
   --highlight-hover: theme('colors.blue.300');
   --gradient-from: theme('colors.blue.400');
-  --gradient-to: theme('colors.indigo.600');
-  --feature-icon: theme('colors.indigo.500');
-  --feature-header: theme('colors.blue.300');
-  --feature-text: theme('colors.blue.200');
-  --nav-bg: theme('colors.blue.900');
+  --gradient-to: theme('colors.blue.600');
+  --nav-bg: rgb(8, 14, 25);
   --nav-border: theme('colors.blue.500/20');
-  --nav-text: theme('colors.white/70');
+  --nav-text: theme('colors.white');
   --nav-text-hover: theme('colors.white');
-  --spotlight: theme('colors.blue.500/10');
+  --progress-bg: theme('colors.blue.900/40');
+  --progress-fill: theme('colors.blue.600');
+  --button-bg: theme('colors.blue.600');
+  --button-hover: theme('colors.blue.700');
+  --button-text: theme('colors.white');
+  --input-bg: theme('colors.blue.900/40');
+  --input-border: theme('colors.blue.500/20');
+  --input-text: theme('colors.white');
+  --input-placeholder: theme('colors.blue.300/50');
 }
 
 /* Pink Dark Theme */
@@ -49,20 +43,21 @@
   --glow-color: theme('colors.purple.600/20');
   --highlight: theme('colors.pink.500');
   --highlight-hover: theme('colors.pink.400');
-}
-
-/* Blue Light Theme */
-.theme-blue-light {
-  --background: theme('colors.blue.50');
-  --text-primary: theme('colors.blue.900');
-  --text-secondary: theme('colors.blue.700');
-  --accent: theme('colors.blue.500');
-  --accent-hover: theme('colors.blue.600');
-  --border: theme('colors.blue.200');
-  --card-bg: theme('colors.white');
-  --glow-color: theme('colors.blue.500/20');
-  --highlight: theme('colors.blue.500');
-  --highlight-hover: theme('colors.blue.400');
+  --gradient-from: theme('colors.purple.400');
+  --gradient-to: theme('colors.pink.600');
+  --nav-bg: theme('colors.black/40');
+  --nav-border: theme('colors.purple.500/20');
+  --nav-text: theme('colors.purple.300');
+  --nav-text-hover: theme('colors.pink.500');
+  --progress-bg: theme('colors.purple.500/20');
+  --progress-fill: theme('colors.pink.500');
+  --button-bg: theme('colors.pink.500');
+  --button-hover: theme('colors.pink.600');
+  --button-text: theme('colors.white');
+  --input-bg: theme('colors.black/40');
+  --input-border: theme('colors.purple.500/20');
+  --input-text: theme('colors.white');
+  --input-placeholder: theme('colors.purple.300/50');
 }
 
 /* Apply theme variables */
@@ -73,13 +68,13 @@ body {
 
 /* Common button styles */
 .btn {
-  background-color: var(--accent);
-  color: var(--text-primary);
+  background-color: var(--button-bg);
+  color: var(--button-text);
   transition: all 0.2s;
 }
 
 .btn:hover {
-  background-color: var(--accent-hover);
+  background-color: var(--button-hover);
 }
 
 /* Common border styles */
@@ -125,28 +120,10 @@ body {
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(to right, var(--gradient-from, var(--accent)) 0%, var(--gradient-to, var(--highlight)) 100%);
+  background: linear-gradient(to right, var(--gradient-from), var(--gradient-to));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* Background glow */
-.bg-glow {
-  background-color: var(--glow-color);
-}
-
-/* Feature styles */
-.feature-icon {
-  color: var(--feature-icon);
-}
-
-.feature-header {
-  color: var(--feature-header);
-}
-
-.feature-text {
-  color: var(--feature-text);
 }
 
 /* Navigation styles */
@@ -163,7 +140,22 @@ body {
   color: var(--nav-text-hover);
 }
 
-/* Spotlight effect */
-.spotlight {
-  background-color: var(--spotlight);
+/* Input styles */
+.input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+}
+
+.input::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Progress bar styles */
+.progress-bar {
+  background-color: var(--progress-bg);
+}
+
+.progress-fill {
+  background-color: var(--progress-fill);
 }
