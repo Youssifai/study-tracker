@@ -10,7 +10,7 @@ interface Session {
   id: string;
   startTime: Date;
   endTime: Date | null;
-  userId: string;
+  totalTime: number | null;
 }
 
 export async function GET() {
@@ -39,6 +39,13 @@ export async function GET() {
           gte: currentWeekStart,
           lte: currentWeekEnd,
         },
+        endTime: { not: null },
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        totalTime: true,
       },
       orderBy: {
         startTime: 'asc',
@@ -74,6 +81,10 @@ export async function GET() {
         startTime: {
           gte: thirtyDaysAgo,
         },
+        endTime: { not: null },
+      },
+      select: {
+        startTime: true,
       },
       orderBy: {
         startTime: 'desc',
@@ -101,12 +112,8 @@ export async function GET() {
     // Format the response
     const sessions = Array.from(sessionsMap.entries()).map(([date, daySessions]) => ({
       date,
-      totalMinutes: daySessions.reduce((acc: number, session: Session) => {
-        if (session.endTime) {
-          const duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
-          return acc + duration;
-        }
-        return acc;
+      totalMinutes: daySessions.reduce((acc: number, session: any) => {
+        return acc + (session.totalTime || 0);
       }, 0),
       hasSession: daySessions.length > 0,
     }));

@@ -10,7 +10,7 @@ interface Session {
   id: string;
   startTime: Date;
   endTime: Date | null;
-  userId: string;
+  totalTime: number | null;
 }
 
 export async function GET() {
@@ -36,16 +36,19 @@ export async function GET() {
           gte: startOfToday,
           lte: endOfToday,
         },
+        endTime: { not: null },
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        totalTime: true,
       },
     });
 
-    // Calculate total minutes studied today
-    const totalMinutes = todaySessions.reduce((acc: number, session: Session) => {
-      if (session.endTime) {
-        const duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / (1000 * 60));
-        return acc + duration;
-      }
-      return acc;
+    // Calculate total minutes studied today using the totalTime field
+    const totalMinutes = todaySessions.reduce((acc: number, session: any) => {
+      return acc + (session.totalTime || 0);
     }, 0);
 
     return NextResponse.json({
