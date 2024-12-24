@@ -436,24 +436,26 @@ export default function PersistentStudyTimer() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 rounded-xl shadow-lg border border-indigo-100 dark:border-indigo-900 overflow-hidden">
-      <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm p-6">
+    <div className="bg-black/60 rounded-xl shadow-lg border border-purple-500/20 overflow-hidden backdrop-blur-sm">
+      <div className="p-6">
         <div className="flex flex-col items-center space-y-6">
           {/* Title with Badge */}
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-100">Focus Timer</h2>
-            <span className="px-2 py-1 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+              Focus Timer
+            </h2>
+            <span className="px-2 py-1 text-xs font-semibold bg-purple-900/30 text-purple-300 rounded-full border border-purple-500/20">
               Persistent
             </span>
           </div>
 
           {/* Timer Display */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur-xl opacity-20"></div>
-            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-inner p-6 min-w-[240px]">
+            <div className="absolute inset-0 bg-purple-500/10 rounded-full blur-xl"></div>
+            <div className="relative bg-black/40 rounded-2xl shadow-inner p-6 min-w-[240px] border border-purple-500/20">
               <div className="flex items-center justify-center gap-3">
-                <Clock className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
-                <span className="text-4xl font-mono font-bold text-indigo-900 dark:text-indigo-100 tabular-nums">
+                <Clock className="w-8 h-8 text-pink-500" />
+                <span className="text-4xl font-mono font-bold text-purple-200 tabular-nums">
                   {formatTime(displaySeconds)}
                 </span>
               </div>
@@ -462,7 +464,7 @@ export default function PersistentStudyTimer() {
 
           {/* Error Message */}
           {timerState.error && (
-            <div className="flex items-center gap-2 text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg">
+            <div className="flex items-center gap-2 text-red-500 bg-black/40 px-4 py-2 rounded-lg border border-purple-500/20">
               <AlertCircle size={16} />
               <span className="text-sm font-medium">{timerState.error}</span>
             </div>
@@ -474,7 +476,7 @@ export default function PersistentStudyTimer() {
               <button
                 onClick={handleStartSession}
                 disabled={timerState.isLoading}
-                className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md hover:shadow-lg ${
+                className={`flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md hover:shadow-lg ${
                   timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -486,11 +488,11 @@ export default function PersistentStudyTimer() {
                 <button
                   onClick={handleTogglePause}
                   disabled={timerState.isLoading}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg font-medium ${
-                    isPaused 
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white' 
-                      : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white'
-                  } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg font-medium 
+                    ${isPaused 
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                      : 'bg-purple-900/30 hover:bg-purple-900/40 text-white'
+                    } ${timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isPaused ? <Play size={20} /> : <Pause size={20} />}
                   <span>{isPaused ? 'Resume Focus' : 'Take a Break'}</span>
@@ -498,7 +500,7 @@ export default function PersistentStudyTimer() {
                 <button
                   onClick={handleEndSession}
                   disabled={timerState.isLoading}
-                  className={`flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white rounded-xl hover:from-rose-600 hover:to-red-600 transition-all shadow-md hover:shadow-lg font-medium ${
+                  className={`flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all shadow-md hover:shadow-lg font-medium ${
                     timerState.isLoading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -511,7 +513,7 @@ export default function PersistentStudyTimer() {
 
           {/* Session Status */}
           {activeSession && (
-            <div className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+            <div className="text-sm text-purple-300 font-medium">
               {isPaused ? 'Session Paused' : 'Focus Session in Progress'}
             </div>
           )}

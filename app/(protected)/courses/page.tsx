@@ -1,21 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Calendar } from 'lucide-react';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { useEffect, useState } from 'react';
+import { Plus, Book, Pencil, Trash2, Calendar } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface Course {
   id: string;
   name: string;
+  description: string | null;
   examDate: string | null;
+  userId: string;
 }
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAddingCourse, setIsAddingCourse] = useState(false);
-  const [newCourse, setNewCourse] = useState({ name: '', examDate: '' });
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    examDate: '',
+  });
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchCourses();
@@ -23,75 +32,68 @@ export default function CoursesPage() {
 
   const fetchCourses = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch('/api/courses');
+      if (!response.ok) throw new Error('Failed to fetch courses');
       const data = await response.json();
       setCourses(data);
     } catch (error) {
-      console.error('Failed to fetch courses:', error);
+      console.error('Error fetching courses:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load courses');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const addCourse = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCourse.name.trim()) return;
+    if (!formData.name.trim()) return;
 
     try {
-      const response = await fetch('/api/courses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newCourse),
+      const url = editingCourse ? `/api/courses/${editingCourse.id}` : '/api/courses';
+      const method = editingCourse ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Failed to add course');
+      if (!response.ok) throw new Error('Failed to save course');
 
-      const addedCourse = await response.json();
-      setCourses([...courses, addedCourse]);
-      setNewCourse({ name: '', examDate: '' });
-      setIsAddingCourse(false);
-    } catch (error) {
-      console.error('Failed to add course:', error);
-    }
-  };
-
-  const updateCourse = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingCourse) return;
-
-    try {
-      const response = await fetch(`/api/courses/${editingCourse.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editingCourse),
-      });
-
-      if (!response.ok) throw new Error('Failed to update course');
-
-      setCourses(courses.map(course => 
-        course.id === editingCourse.id ? editingCourse : course
-      ));
+      await fetchCourses();
+      setIsModalOpen(false);
       setEditingCourse(null);
+      setFormData({ name: '', description: '', examDate: '' });
     } catch (error) {
-      console.error('Failed to update course:', error);
+      console.error('Error saving course:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save course');
     }
   };
 
-  const deleteCourse = async (id: string) => {
+  const handleEdit = (course: Course) => {
+    setEditingCourse(course);
+    setFormData({
+      name: course.name,
+      description: course.description || '',
+      examDate: course.examDate || '',
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this course?')) return;
+
     try {
       const response = await fetch(`/api/courses/${id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to delete course');
-
-      setCourses(courses.filter(course => course.id !== id));
+      await fetchCourses();
     } catch (error) {
-      console.error('Failed to delete course:', error);
+      console.error('Error deleting course:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete course');
     }
   };
 
@@ -105,147 +107,130 @@ export default function CoursesPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="flex justify-center items-center min-h-screen">
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Courses</h1>
-        <button
-          onClick={() => setIsAddingCourse(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400 transition-colors"
-        >
-          <Plus size={20} />
-          Add Course
-        </button>
-      </div>
+    <div className="relative min-h-screen bg-black">
+      {/* Background Glow Effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
 
-      {isAddingCourse && (
-        <form onSubmit={addCourse} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow space-y-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Course Name
-            </label>
-            <input
-              type="text"
-              value={newCourse.name}
-              onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-              placeholder="Enter course name"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Exam Date (optional)
-            </label>
-            <input
-              type="date"
-              value={newCourse.examDate}
-              onChange={(e) => setNewCourse({ ...newCourse, examDate: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setIsAddingCourse(false)}
-              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
-            >
-              Add Course
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="grid gap-4">
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow"
+      <div className="relative max-w-7xl mx-auto p-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+            Your Courses
+          </h1>
+          <button
+            onClick={() => {
+              setEditingCourse(null);
+              setFormData({ name: '', description: '', examDate: '' });
+              setIsModalOpen(true);
+            }}
+            className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(236,72,153,0.3)]"
           >
-            {editingCourse?.id === course.id ? (
-              <form onSubmit={updateCourse} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Course Name
-                  </label>
+            <Plus size={20} />
+            Add Course
+          </button>
+        </div>
+
+        {/* Course Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <div
+              key={course.id}
+              className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] group"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <Book className="w-5 h-5 text-pink-500" />
+                  <h3 className="text-lg font-semibold text-white">{course.name}</h3>
+                </div>
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => handleEdit(course)}
+                    className="p-1 text-purple-300 hover:text-pink-500 transition-colors"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(course.id)}
+                    className="p-1 text-purple-300 hover:text-pink-500 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+              {course.description && (
+                <p className="mt-2 text-sm text-purple-300">{course.description}</p>
+              )}
+              {course.examDate && (
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4 text-pink-500" />
+                  <span className="text-purple-300">
+                    Exam in {calculateDaysUntilExam(course.examDate)} days ({new Date(course.examDate).toLocaleDateString()})
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 w-[90%] max-w-md">
+              <h2 className="text-xl font-semibold text-white mb-4">
+                {editingCourse ? 'Edit Course' : 'Add New Course'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
                   <input
                     type="text"
-                    value={editingCourse.name}
-                    onChange={(e) => setEditingCourse({ ...editingCourse, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Course name"
+                    className="w-full px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Exam Date
-                  </label>
+                <div>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Course description (optional)"
+                    className="w-full px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50 min-h-[100px]"
+                  />
+                </div>
+                <div>
                   <input
                     type="date"
-                    value={editingCourse.examDate || ''}
-                    onChange={(e) => setEditingCourse({ ...editingCourse, examDate: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                    value={formData.examDate}
+                    onChange={(e) => setFormData({ ...formData, examDate: e.target.value })}
+                    className="w-full px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
                   />
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-3">
                   <button
                     type="button"
-                    onClick={() => setEditingCourse(null)}
-                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 text-purple-300 hover:text-pink-500 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
+                    className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all shadow-[0_0_15px_rgba(236,72,153,0.3)]"
                   >
-                    Save
+                    {editingCourse ? 'Save Changes' : 'Add Course'}
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    {course.name}
-                  </h3>
-                  {course.examDate && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                      <Calendar size={16} />
-                      <span>
-                        Exam in {calculateDaysUntilExam(course.examDate)} days ({new Date(course.examDate).toLocaleDateString()})
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setEditingCourse(course)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => deleteCourse(course.id)}
-                    className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

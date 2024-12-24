@@ -44,48 +44,62 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-black">
         <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="relative min-h-screen bg-black">
+      {/* Background Glow Effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto p-8">
         {/* Welcome Message */}
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
           Welcome back, {session?.user?.name}!
         </h1>
 
-        {/* Group Section at Top */}
-        <div className="mb-8">
-          {hasGroup ? (
-            <GroupBar />
-          ) : (
-            <GroupActions />
-          )}
-        </div>
+        {/* Group Section at Top - Only show if not logged in */}
+        {!session?.user && (
+          <div className="mb-8 bg-black/60 rounded-xl border border-purple-500/20 p-4 shadow-[0_0_15px_rgba(168,85,247,0.15)] backdrop-blur-sm">
+            {hasGroup ? <GroupBar /> : <GroupActions />}
+          </div>
+        )}
 
         {/* Two Column Layout for Tasks and Progress */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column - Timer and Tasks */}
           <div className="space-y-8">
             {/* Timer Section */}
-            <PersistentStudyTimer />
+            <div className="shadow-[0_0_25px_rgba(168,85,247,0.15)]">
+              <PersistentStudyTimer />
+            </div>
 
             {/* Tasks Section */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Your Tasks</h2>
+            <div className="bg-black/60 rounded-xl border border-purple-500/20 p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] backdrop-blur-sm">
+              <h2 className="text-xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                Your Tasks
+              </h2>
               <TodoList />
             </div>
           </div>
 
           {/* Right Column - Study Progress */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Study Progress</h2>
-            <StudyProgress />
-            <DailyTeamProgress />
+          <div className="space-y-8">
+            <div className="bg-black/60 rounded-xl border border-purple-500/20 p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] backdrop-blur-sm">
+              <h2 className="text-xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                Study Progress
+              </h2>
+              <StudyProgress />
+            </div>
+            <div className="bg-black/60 rounded-xl border border-purple-500/20 p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] backdrop-blur-sm">
+              <h2 className="text-xl font-semibold mb-6 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                Today's Team Progress
+              </h2>
+              <DailyTeamProgress />
+            </div>
           </div>
         </div>
       </div>

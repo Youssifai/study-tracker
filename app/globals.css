@@ -2,58 +2,176 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-  }
+/* Theme Styles */
+:root {
+  --background: theme('colors.blue.50');
+  --text-primary: theme('colors.blue.900');
+  --text-secondary: theme('colors.blue.700');
+  --accent: theme('colors.blue.500');
+  --accent-hover: theme('colors.blue.600');
+  --border: theme('colors.blue.200');
+  --card-bg: theme('colors.white');
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Blue Dark Theme */
+.theme-blue-dark {
+  --background: theme('colors.blue.900');
+  --text-primary: theme('colors.white');
+  --text-secondary: theme('colors.blue.300');
+  --accent: theme('colors.blue.500');
+  --accent-hover: theme('colors.blue.600');
+  --border: theme('colors.blue.500/20');
+  --card-bg: theme('colors.blue.800/80');
+  --glow-color: theme('colors.blue.900/50');
+  --highlight: theme('colors.blue.400');
+  --highlight-hover: theme('colors.blue.300');
+  --gradient-from: theme('colors.blue.400');
+  --gradient-to: theme('colors.blue.600');
+  --feature-icon: theme('colors.blue.500');
+  --feature-header: theme('colors.blue.300');
+  --feature-text: theme('colors.blue.200');
+  --nav-bg: theme('colors.blue.800');
+  --nav-border: theme('colors.blue.500/20');
+  --nav-text: theme('colors.blue.300');
+  --nav-text-hover: theme('colors.blue.200');
+  --spotlight: theme('colors.blue.900/30');
+  --progress-bg: theme('colors.blue.800');
+  --progress-fill: theme('colors.blue.500');
+  --timer-bg: theme('colors.blue.800/80');
+  --timer-text: theme('colors.blue.200');
+  --timer-accent: theme('colors.blue.500');
+  --todo-bg: theme('colors.blue.800/80');
+  --todo-text: theme('colors.blue.200');
+  --todo-border: theme('colors.blue.500/20');
+}
+
+/* Pink Dark Theme */
+.theme-pink-dark {
+  --background: theme('colors.black');
+  --text-primary: theme('colors.white');
+  --text-secondary: theme('colors.purple.300');
+  --accent: theme('colors.pink.500');
+  --accent-hover: theme('colors.pink.600');
+  --border: theme('colors.purple.500/20');
+  --card-bg: theme('colors.black/40');
+  --glow-color: theme('colors.purple.600/20');
+  --highlight: theme('colors.pink.500');
+  --highlight-hover: theme('colors.pink.400');
+}
+
+/* Blue Light Theme */
+.theme-blue-light {
+  --background: theme('colors.blue.50');
+  --text-primary: theme('colors.blue.900');
+  --text-secondary: theme('colors.blue.700');
+  --accent: theme('colors.blue.500');
+  --accent-hover: theme('colors.blue.600');
+  --border: theme('colors.blue.200');
+  --card-bg: theme('colors.white');
+  --glow-color: theme('colors.blue.500/20');
+  --highlight: theme('colors.blue.500');
+  --highlight-hover: theme('colors.blue.400');
+}
+
+/* Apply theme variables */
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+/* Common button styles */
+.btn {
+  background-color: var(--accent);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Common border styles */
+.border-themed {
+  border-color: var(--border);
+}
+
+/* Card styles */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+/* Accent text */
+.text-accent {
+  color: var(--accent);
+}
+
+/* Accent background */
+.bg-accent {
+  background-color: var(--accent);
+}
+
+/* Secondary text */
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+/* Glow effects */
+.glow {
+  box-shadow: 0 0 15px var(--glow-color);
+}
+
+/* Highlight text */
+.text-highlight {
+  color: var(--highlight);
+}
+
+.text-highlight:hover {
+  color: var(--highlight-hover);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(to right, var(--gradient-from, var(--accent)) 0%, var(--gradient-to, var(--highlight)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Background glow */
+.bg-glow {
+  background-color: var(--glow-color);
+}
+
+/* Feature styles */
+.feature-icon {
+  color: var(--feature-icon);
+}
+
+.feature-header {
+  color: var(--feature-header);
+}
+
+.feature-text {
+  color: var(--feature-text);
+}
+
+/* Navigation styles */
+.nav {
+  background-color: var(--nav-bg);
+  border-color: var(--nav-border);
+}
+
+.nav-text {
+  color: var(--nav-text);
+}
+
+.nav-text:hover {
+  color: var(--nav-text-hover);
+}
+
+/* Spotlight effect */
+.spotlight {
+  background-color: var(--spotlight);
 }

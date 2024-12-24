@@ -22,9 +22,9 @@ interface Course {
 type Priority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 const priorityColors = {
-  LOW: 'text-gray-500 dark:text-gray-400',
-  MEDIUM: 'text-yellow-500 dark:text-yellow-400',
-  HIGH: 'text-red-500 dark:text-red-400'
+  LOW: 'text-purple-300',
+  MEDIUM: 'text-pink-500',
+  HIGH: 'text-red-500'
 } as const;
 
 export default function TodoList() {
@@ -156,13 +156,13 @@ export default function TodoList() {
             value={newTodo.title}
             onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
             placeholder="Add a new task..."
-            className="flex-1 px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
           />
-          <div className="flex items-center gap-1 px-2 border rounded-lg dark:border-gray-600">
+          <div className="flex items-center gap-1 px-2 bg-black/40 border border-purple-500/20 rounded-lg">
             <button
               type="button"
               onClick={() => handlePriorityChange('up')}
-              className="p-1 hover:text-blue-500 dark:hover:text-blue-400"
+              className="p-1 text-purple-400 hover:text-pink-500 transition-colors"
             >
               <ChevronUp size={16} />
             </button>
@@ -170,7 +170,7 @@ export default function TodoList() {
             <button
               type="button"
               onClick={() => handlePriorityChange('down')}
-              className="p-1 hover:text-blue-500 dark:hover:text-blue-400"
+              className="p-1 text-purple-400 hover:text-pink-500 transition-colors"
             >
               <ChevronDown size={16} />
             </button>
@@ -182,22 +182,22 @@ export default function TodoList() {
             value={newTodo.tag}
             onChange={(e) => setNewTodo({ ...newTodo, tag: e.target.value })}
             placeholder="Tag (e.g., homework, exam)"
-            className="flex-1 px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500/50"
           />
           <select
             value={newTodo.courseId}
             onChange={(e) => setNewTodo({ ...newTodo, courseId: e.target.value })}
-            className="flex-1 px-3 py-2 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            className="flex-1 px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
           >
             {courses.map(course => (
-              <option key={course.id} value={course.id}>
+              <option key={course.id} value={course.id} className="bg-black text-white">
                 {course.name}
               </option>
             ))}
           </select>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all shadow-md hover:shadow-lg"
           >
             Add
           </button>
@@ -210,31 +210,31 @@ export default function TodoList() {
           return (
             <div
               key={todo.id}
-              className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 group"
+              className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-purple-500/20 group backdrop-blur-sm"
             >
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => toggleTodo(todo.id)}
                   className={`p-1 rounded-md transition-colors ${
                     todo.completed
-                      ? 'bg-green-100 dark:bg-green-900/20 text-green-500 dark:text-green-400'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-purple-500/20 text-pink-500'
+                      : 'hover:bg-purple-500/10 text-purple-400'
                   }`}
                 >
                   <Check size={16} className={todo.completed ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'} />
                 </button>
-                <div className={`flex flex-col ${todo.completed ? 'text-gray-400 dark:text-gray-500' : ''}`}>
+                <div className={`flex flex-col ${todo.completed ? 'text-purple-500/50' : 'text-white'}`}>
                   <span className="text-sm">{todo.title}</span>
                   <div className="flex items-center gap-2 text-xs">
                     {todo.tag && (
-                      <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded">
+                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">
                         {todo.tag}
                       </span>
                     )}
                     <div className="flex items-center gap-1">
                       <Flag className={`${priorityColors[todo.priority]} w-3 h-3`} />
                       {course && (
-                        <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <span className="text-purple-400 flex items-center gap-1">
                           <Book size={12} />
                           {course.name}
                         </span>
@@ -245,7 +245,7 @@ export default function TodoList() {
               </div>
               <button
                 onClick={() => deleteTodo(todo.id)}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                className="opacity-0 group-hover:opacity-100 p-1 text-purple-400 hover:text-pink-500 transition-colors"
               >
                 <X size={16} />
               </button>

@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Edit2, X, Crown, Users, Trash2, LogOut } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
+import { Users, UserMinus, Copy, Check, Crown, Pencil, X } from 'lucide-react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
-import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface Member {
   id: string;
   name: string;
+  email: string;
+  image: string | null;
 }
 
 interface GroupStats {
@@ -24,41 +27,25 @@ interface GroupStats {
     todayTime: number;
     monthlyTime: number;
   }>;
-  groupTotals: {
-    totalMinutes: number;
-    averageMinutesPerMember: number;
-    memberCount: number;
-  };
 }
 
 interface Group {
   id: string;
   name: string;
   inviteCode: string;
-  ownerId: string;
   members: Member[];
-  owner: {
-    id: string;
-    name: string;
-  };
+  ownerId: string;
 }
 
-interface MemberWithStats {
-  userId: string;
-  userName: string;
-  todayTime: number;
-  monthlyTime: number;
-  isOwner: boolean;
-}
-
-export default function GroupPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
+export default function GroupPage() {
+  const params = useParams();
   const [group, setGroup] = useState<Group | null>(null);
   const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -67,20 +54,14 @@ export default function GroupPage({ params }: { params: { id: string } }) {
 
     // Set up auto-refresh every 30 seconds
     const refreshInterval = setInterval(fetchGroupStats, 30000);
-
     return () => clearInterval(refreshInterval);
   }, [params.id]);
 
   const fetchGroup = async () => {
     try {
       setIsLoading(true);
-      setError(null);
       const response = await fetch(`/api/groups/${params.id}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch group');
-      }
-
+      if (!response.ok) throw new Error('Failed to fetch group');
       const data = await response.json();
       setGroup(data);
       setNewGroupName(data.name);
@@ -95,13 +76,40 @@ export default function GroupPage({ params }: { params: { id: string } }) {
   const fetchGroupStats = async () => {
     try {
       const response = await fetch(`/api/groups/${params.id}/stats`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch group stats');
-      }
+      if (!response.ok) throw new Error('Failed to fetch group stats');
       const data = await response.json();
       setGroupStats(data);
     } catch (error) {
       console.error('Error fetching group stats:', error);
+    }
+  };
+
+  const handleCopyInviteCode = async () => {
+    if (!group?.inviteCode) return;
+    try {
+      await navigator.clipboard.writeText(group.inviteCode);
+      setCopied(true);
+      toast.success('Invite code copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy invite code:', error);
+      toast.error('Failed to copy invite code');
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    if (!confirm('Are you sure you want to leave this group?')) return;
+
+    try {
+      const response = await fetch(`/api/groups/${params.id}/leave`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) throw new Error('Failed to leave group');
+      window.location.href = '/dashboard';
+    } catch (error) {
+      console.error('Error leaving group:', error);
+      toast.error('Failed to leave group');
     }
   };
 
@@ -117,92 +125,36 @@ export default function GroupPage({ params }: { params: { id: string } }) {
         body: JSON.stringify({ name: newGroupName }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update group name');
-      }
-
+      if (!response.ok) throw new Error('Failed to update group name');
       setGroup({ ...group, name: newGroupName });
       setIsEditing(false);
+      toast.success('Group name updated successfully');
     } catch (error) {
       console.error('Error updating group name:', error);
-      setError(error instanceof Error ? error.message : 'Failed to update group name');
+      toast.error('Failed to update group name');
     }
   };
 
-  const removeMember = async (memberId: string) => {
-    if (!group) return;
+  const handleKickMember = async (memberId: string) => {
+    if (!confirm('Are you sure you want to remove this member?')) return;
 
     try {
-      const response = await fetch(`/api/groups/${group.id}/members/${memberId}`, {
+      const response = await fetch(`/api/groups/${group?.id}/members/${memberId}`, {
         method: 'DELETE',
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to remove member');
-      }
-
-      setGroup({
-        ...group,
-        members: group.members.filter(member => member.id !== memberId),
-      });
+      if (!response.ok) throw new Error('Failed to remove member');
+      await fetchGroup();
+      toast.success('Member removed successfully');
     } catch (error) {
       console.error('Error removing member:', error);
-      setError(error instanceof Error ? error.message : 'Failed to remove member');
-    }
-  };
-
-  const getMemberWithStats = (member: Member): MemberWithStats => {
-    const stats = groupStats?.todayStats?.find(stat => stat.userId === member.id);
-    return {
-      userId: member.id,
-      userName: member.name,
-      todayTime: stats?.todayTime || 0,
-      monthlyTime: stats?.monthlyTime || 0,
-      isOwner: member.id === group?.ownerId
-    };
-  };
-
-  const leaveGroup = async () => {
-    if (!confirm('Are you sure you want to leave this group?')) return;
-
-    try {
-      const response = await fetch('/api/groups/leave', {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to leave group');
-      }
-
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Error leaving group:', error);
-      setError(error instanceof Error ? error.message : 'Failed to leave group');
-    }
-  };
-
-  const deleteGroup = async () => {
-    if (!confirm('Are you sure you want to delete this group? This action cannot be undone.')) return;
-
-    try {
-      const response = await fetch(`/api/groups/${params.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete group');
-      }
-
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Error deleting group:', error);
-      setError(error instanceof Error ? error.message : 'Failed to delete group');
+      toast.error('Failed to remove member');
     }
   };
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="flex justify-center items-center min-h-screen">
         <LoadingSpinner />
       </div>
     );
@@ -210,8 +162,9 @@ export default function GroupPage({ params }: { params: { id: string } }) {
 
   if (error || !group) {
     return (
-      <div className="p-6">
-        <div className="text-red-500 dark:text-red-400">{error || 'Failed to load group'}</div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-semibold text-white mb-4">Error</h2>
+        <p className="text-purple-300">{error || 'Failed to load group'}</p>
       </div>
     );
   }
@@ -219,182 +172,177 @@ export default function GroupPage({ params }: { params: { id: string } }) {
   const isOwner = session?.user?.email === group.ownerId;
 
   return (
-    <div className="p-6">
-      {/* Centered Group Header */}
-      <div className="mb-8 text-center">
-        <div className="flex flex-col items-center justify-center gap-2">
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-full">
-            <Users className="w-8 h-8 text-blue-500 dark:text-blue-400" />
-          </div>
-          {isEditing ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
-                className="px-3 py-1 border rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-              />
-              <button
-                onClick={updateGroupName}
-                className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-400"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setNewGroupName(group.name);
-                }}
-                className="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{group.name}</h1>
-              {isOwner && (
+    <div className="relative min-h-screen bg-black">
+      {/* Background Glow Effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto p-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-4">
+            {isEditing ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newGroupName}
+                  onChange={(e) => setNewGroupName(e.target.value)}
+                  className="px-3 py-2 bg-black/40 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
+                />
                 <button
-                  onClick={() => setIsEditing(true)}
-                  className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
+                  onClick={updateGroupName}
+                  className="px-3 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all"
                 >
-                  <Edit2 size={18} />
+                  Save
                 </button>
-              )}
-            </div>
-          )}
-          <div className="text-sm text-gray-600 dark:text-gray-300">
-            Invite Code: <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{group.inviteCode}</span>
-          </div>
-          <div className="flex items-center gap-2 mt-2">
-            {isOwner ? (
-              <button
-                onClick={deleteGroup}
-                className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-              >
-                <Trash2 size={16} />
-                <span>Delete Group</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setNewGroupName(group.name);
+                  }}
+                  className="px-3 py-2 text-purple-300 hover:text-pink-500"
+                >
+                  Cancel
+                </button>
+              </div>
             ) : (
-              <button
-                onClick={leaveGroup}
-                className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-              >
-                <LogOut size={16} />
-                <span>Leave Group</span>
-              </button>
+              <>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                  {group.name}
+                </h1>
+                {isOwner && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-1 text-purple-300 hover:text-pink-500 transition-colors"
+                  >
+                    <Pencil size={20} />
+                  </button>
+                )}
+              </>
             )}
           </div>
+          <button
+            onClick={handleLeaveGroup}
+            className="px-4 py-2 bg-black/40 border border-purple-500/20 text-purple-300 hover:text-pink-500 rounded-lg transition-all flex items-center gap-2"
+          >
+            <UserMinus size={20} />
+            Leave Group
+          </button>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column - Members List */}
-        <div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Members</h2>
+        {/* Invite Code Section */}
+        <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 mb-8 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-2">Invite Code</h2>
+              <p className="text-purple-300">Share this code with others to invite them to your group</p>
             </div>
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {group.members.length > 0 ? (
-                group.members.map((member) => (
+            <button
+              onClick={handleCopyInviteCode}
+              className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(236,72,153,0.3)]"
+            >
+              {copied ? <Check size={20} /> : <Copy size={20} />}
+              {copied ? 'Copied!' : 'Copy Code'}
+            </button>
+          </div>
+          <div className="mt-4 p-3 bg-black/40 border border-purple-500/20 rounded-lg">
+            <code className="text-pink-500 font-mono">{group.inviteCode}</code>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Column - Members */}
+          <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+            <div className="flex items-center gap-3 mb-6">
+              <Users className="w-6 h-6 text-pink-500" />
+              <h2 className="text-xl font-semibold text-white">Group Members</h2>
+            </div>
+            <div className="grid gap-4">
+              {group.members.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg group"
+                >
+                  <div className="flex items-center gap-4">
+                    {member.image ? (
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-10 h-10 rounded-full"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
+                        <span className="text-pink-500 font-semibold">
+                          {member.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-white">{member.name}</h3>
+                      {member.id === group.ownerId && (
+                        <Crown className="w-4 h-4 text-pink-500" />
+                      )}
+                    </div>
+                  </div>
+                  {isOwner && member.id !== group.ownerId && (
+                    <button
+                      onClick={() => handleKickMember(member.id)}
+                      className="opacity-0 group-hover:opacity-100 p-1 text-purple-300 hover:text-pink-500 transition-all"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column - Stats */}
+          <div className="space-y-8">
+            {/* Monthly Leaderboard */}
+            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+              <h2 className="text-xl font-semibold text-white mb-6">Monthly Leaderboard</h2>
+              <div className="space-y-4">
+                {groupStats?.monthlyStats.map((stat, index) => (
                   <div
-                    key={member.id}
-                    className="flex items-center justify-between px-4 py-2 group"
+                    key={stat.userId}
+                    className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-900 dark:text-gray-100">{member.name}</span>
-                      {member.id === group.ownerId && (
-                        <Crown className="w-4 h-4 text-yellow-500" />
-                      )}
-                    </div>
-                    {isOwner && member.id !== group.ownerId && (
-                      <button
-                        onClick={() => removeMember(member.id)}
-                        className="p-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
-                        title="Remove member"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="p-4 text-gray-500 dark:text-gray-400">No members found</div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Stats and Leaderboard */}
-        <div className="space-y-6">
-          {/* Monthly Leaderboard */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Monthly Leaderboard</h2>
-            </div>
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {groupStats?.monthlyStats.map((stat, index) => (
-                <div
-                  key={stat.userId}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                      <span className="text-white">{stat.userName}</span>
                       {index === 0 && stat.monthlyTime > 0 && (
-                        <Crown className="w-5 h-5 text-yellow-500" />
-                      )}
-                      {stat.userId === group.ownerId && (
-                        <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
-                          Owner
-                        </span>
+                        <Crown className="w-4 h-4 text-pink-500" />
                       )}
                     </div>
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">
+                    <div className="text-purple-300">
                       {Math.floor(stat.monthlyTime / 60)}h {Math.round(stat.monthlyTime % 60)}m
-                    </span>
-                    <span className="text-gray-400 dark:text-gray-500 ml-1">this month</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Today's Activity */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Activity</h2>
-            </div>
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {groupStats?.todayStats.map((stat, index) => (
-                <div
-                  key={stat.userId}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
-                      {index === 0 && stat.todayTime > 0 && (
-                        <Crown className="w-5 h-5 text-yellow-500" />
-                      )}
-                      {stat.userId === group.ownerId && (
-                        <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
-                          Owner
-                        </span>
-                      )}
                     </div>
                   </div>
-                  <div className="text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">
+                ))}
+              </div>
+            </div>
+
+            {/* Today's Activity */}
+            <div className="bg-black/40 border border-purple-500/20 backdrop-blur-sm rounded-lg p-6 shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+              <h2 className="text-xl font-semibold text-white mb-6">Today's Activity</h2>
+              <div className="space-y-4">
+                {groupStats?.todayStats.map((stat, index) => (
+                  <div
+                    key={stat.userId}
+                    className="flex items-center justify-between p-4 bg-black/40 border border-purple-500/20 rounded-lg"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-white">{stat.userName}</span>
+                      {index === 0 && stat.todayTime > 0 && (
+                        <Crown className="w-4 h-4 text-pink-500" />
+                      )}
+                    </div>
+                    <div className="text-purple-300">
                       {Math.floor(stat.todayTime / 60)}h {Math.round(stat.todayTime % 60)}m
-                    </span>
-                    <span className="text-gray-400 dark:text-gray-500 ml-1">today</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
