@@ -8,17 +8,28 @@ export default function SessionTimer() {
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [activeSession, setActiveSession] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
   const { data: session } = useSession();
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev + 1);
-      }, 1000);
+    let animationFrameId: number;
+    
+    if (isRunning && startTime) {
+      const updateTimer = () => {
+        const elapsedSeconds = Math.floor((performance.now() - startTime) / 1000);
+        setTimer(elapsedSeconds);
+        animationFrameId = requestAnimationFrame(updateTimer);
+      };
+      
+      animationFrameId = requestAnimationFrame(updateTimer);
     }
-    return () => clearInterval(interval);
-  }, [isRunning]);
+    
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [isRunning, startTime]);
 
   const startSession = async () => {
     try {
@@ -36,6 +47,7 @@ export default function SessionTimer() {
       const data = await response.json();
       setActiveSession(data.id);
       setIsRunning(true);
+      setStartTime(performance.now());
       setTimer(0);
     } catch (error) {
       console.error('Failed to start session:', error);

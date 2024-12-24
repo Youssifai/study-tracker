@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Edit2, X, Crown, Users } from 'lucide-react';
+import { Edit2, X, Crown, Users, Trash2, LogOut } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { useRouter } from 'next/navigation';
 
 interface Member {
   id: string;
@@ -51,6 +52,7 @@ interface MemberWithStats {
 }
 
 export default function GroupPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [group, setGroup] = useState<Group | null>(null);
   const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -160,6 +162,44 @@ export default function GroupPage({ params }: { params: { id: string } }) {
     };
   };
 
+  const leaveGroup = async () => {
+    if (!confirm('Are you sure you want to leave this group?')) return;
+
+    try {
+      const response = await fetch('/api/groups/leave', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to leave group');
+      }
+
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error leaving group:', error);
+      setError(error instanceof Error ? error.message : 'Failed to leave group');
+    }
+  };
+
+  const deleteGroup = async () => {
+    if (!confirm('Are you sure you want to delete this group? This action cannot be undone.')) return;
+
+    try {
+      const response = await fetch(`/api/groups/${params.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete group');
+      }
+
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete group');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -226,6 +266,25 @@ export default function GroupPage({ params }: { params: { id: string } }) {
           <div className="text-sm text-gray-600 dark:text-gray-300">
             Invite Code: <span className="font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{group.inviteCode}</span>
           </div>
+          <div className="flex items-center gap-2 mt-2">
+            {isOwner ? (
+              <button
+                onClick={deleteGroup}
+                className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              >
+                <Trash2 size={16} />
+                <span>Delete Group</span>
+              </button>
+            ) : (
+              <button
+                onClick={leaveGroup}
+                className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              >
+                <LogOut size={16} />
+                <span>Leave Group</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -252,7 +311,8 @@ export default function GroupPage({ params }: { params: { id: string } }) {
                     {isOwner && member.id !== group.ownerId && (
                       <button
                         onClick={() => removeMember(member.id)}
-                        className="p-1 text-gray-500 dark:text-gray-400"
+                        className="p-1 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        title="Remove member"
                       >
                         <X size={16} />
                       </button>
