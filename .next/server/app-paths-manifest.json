@@ -1,9 +1,7 @@
 {
-  "/not-found": "app/not-found.js",
+  "/api/groups/[id]/stats/route": "app/api/groups/[id]/stats/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/groups/route": "app/api/groups/route.js",
-  "/api/groups/[id]/stats/route": "app/api/groups/[id]/stats/route.js",
-  "/api/groups/[id]/route": "app/api/groups/[id]/route.js",
   "/(protected)/group/[id]/page": "app/(protected)/group/[id]/page.js",
   "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js"
 }

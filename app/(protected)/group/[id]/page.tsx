@@ -11,10 +11,17 @@ interface Member {
 }
 
 interface GroupStats {
-  memberStats: Array<{
+  todayStats: Array<{
     userId: string;
     userName: string;
     todayTime: number;
+    monthlyTime: number;
+  }>;
+  monthlyStats: Array<{
+    userId: string;
+    userName: string;
+    todayTime: number;
+    monthlyTime: number;
   }>;
   groupTotals: {
     totalMinutes: number;
@@ -39,6 +46,7 @@ interface MemberWithStats {
   userId: string;
   userName: string;
   todayTime: number;
+  monthlyTime: number;
   isOwner: boolean;
 }
 
@@ -142,11 +150,12 @@ export default function GroupPage({ params }: { params: { id: string } }) {
   };
 
   const getMemberWithStats = (member: Member): MemberWithStats => {
-    const stats = groupStats?.memberStats?.find(stat => stat.userId === member.id);
+    const stats = groupStats?.todayStats?.find(stat => stat.userId === member.id);
     return {
       userId: member.id,
       userName: member.name,
       todayTime: stats?.todayTime || 0,
+      monthlyTime: stats?.monthlyTime || 0,
       isOwner: member.id === group?.ownerId
     };
   };
@@ -259,41 +268,73 @@ export default function GroupPage({ params }: { params: { id: string } }) {
 
         {/* Right Column - Stats and Leaderboard */}
         <div className="space-y-6">
+          {/* Monthly Leaderboard */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Monthly Leaderboard</h2>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+              {groupStats?.monthlyStats.map((stat, index) => (
+                <div
+                  key={stat.userId}
+                  className="flex items-center justify-between px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                      {index === 0 && stat.monthlyTime > 0 && (
+                        <Crown className="w-5 h-5 text-yellow-500" />
+                      )}
+                      {stat.userId === group.ownerId && (
+                        <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
+                          Owner
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-gray-600 dark:text-gray-300">
+                    <span className="font-medium">
+                      {Math.floor(stat.monthlyTime / 60)}h {Math.round(stat.monthlyTime % 60)}m
+                    </span>
+                    <span className="text-gray-400 dark:text-gray-500 ml-1">this month</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Today's Activity */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="p-4 border-b border-gray-100 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Today's Activity</h2>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {group.members
-                .map(getMemberWithStats)
-                .sort((a, b) => b.todayTime - a.todayTime)
-                .map((stat, index) => (
-                  <div
-                    key={stat.userId}
-                    className="flex items-center justify-between px-4 py-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
-                        {index === 0 && stat.todayTime > 0 && (
-                          <Crown className="w-5 h-5 text-yellow-500" />
-                        )}
-                        {stat.isOwner && (
-                          <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
-                            Owner
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-gray-600 dark:text-gray-300">
-                      <span className="font-medium">
-                        {Math.floor(stat.todayTime / 60)}h {Math.round(stat.todayTime % 60)}m
-                      </span>
-                      <span className="text-gray-400 dark:text-gray-500 ml-1">today</span>
+              {groupStats?.todayStats.map((stat, index) => (
+                <div
+                  key={stat.userId}
+                  className="flex items-center justify-between px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-900 dark:text-gray-100">{stat.userName}</span>
+                      {index === 0 && stat.todayTime > 0 && (
+                        <Crown className="w-5 h-5 text-yellow-500" />
+                      )}
+                      {stat.userId === group.ownerId && (
+                        <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
+                          Owner
+                        </span>
+                      )}
                     </div>
                   </div>
-                ))}
+                  <div className="text-gray-600 dark:text-gray-300">
+                    <span className="font-medium">
+                      {Math.floor(stat.todayTime / 60)}h {Math.round(stat.todayTime % 60)}m
+                    </span>
+                    <span className="text-gray-400 dark:text-gray-500 ml-1">today</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -47,6 +47,11 @@ export async function GET(
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
+    // Get current month's start time
+    const monthStart = new Date();
+    monthStart.setDate(1); // First day of current month
+    monthStart.setHours(0, 0, 0, 0);
+
     // Get study time per member
     const memberStats = await Promise.all(
       groupMembers.map(async (member) => {
@@ -62,23 +67,40 @@ export async function GET(
           },
         });
 
+        // Get monthly study time
+        const monthlyStats = await prisma.session.aggregate({
+          where: {
+            userId: member.id,
+            startTime: { gte: monthStart },
+            endTime: { not: null },
+          },
+          _sum: {
+            totalTime: true,
+          },
+        });
+
         return {
           userId: member.id,
           userName: member.name,
           todayTime: todayStats._sum.totalTime || 0,
+          monthlyTime: monthlyStats._sum.totalTime || 0,
         };
       })
     );
 
-    // Sort by today's study time (descending)
-    const leaderboard = memberStats.sort((a, b) => b.todayTime - a.todayTime);
+    // Sort members by today's study time
+    const todayLeaderboard = [...memberStats].sort((a, b) => b.todayTime - a.todayTime);
+
+    // Sort members by monthly study time
+    const monthlyLeaderboard = [...memberStats].sort((a, b) => b.monthlyTime - a.monthlyTime);
 
     // Calculate group totals for today
     const totalMinutes = memberStats.reduce((sum, member) => sum + member.todayTime, 0);
     const averageMinutesPerMember = Math.round(totalMinutes / memberStats.length);
 
     return NextResponse.json({
-      memberStats: leaderboard,
+      todayStats: todayLeaderboard,
+      monthlyStats: monthlyLeaderboard,
       groupTotals: {
         totalMinutes,
         averageMinutesPerMember,
