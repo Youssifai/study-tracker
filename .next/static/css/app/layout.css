@@ -1353,15 +1353,6 @@ video {
 .border-transparent {
   border-color: transparent;
 }
-.border-\[var\(--border\)\] {
-  border-color: var(--border);
-}
-.border-\[var\(--accent\)\] {
-  border-color: var(--accent);
-}
-.border-\[var\(--todo-border\)\] {
-  border-color: var(--todo-border);
-}
 .border-l-transparent {
   border-left-color: transparent;
 }
@@ -1484,27 +1475,6 @@ video {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-.bg-\[var\(--timer-accent\)\] {
-  background-color: var(--timer-accent);
-}
-.bg-\[var\(--timer-bg\)\] {
-  background-color: var(--timer-bg);
-}
-.bg-\[var\(--accent\)\] {
-  background-color: var(--accent);
-}
-.bg-\[var\(--card-bg\)\] {
-  background-color: var(--card-bg);
-}
-.bg-\[var\(--todo-bg\)\] {
-  background-color: var(--todo-bg);
-}
-.bg-\[var\(--progress-bg\)\] {
-  background-color: var(--progress-bg);
-}
-.bg-\[var\(--progress-fill\)\] {
-  background-color: var(--progress-fill);
 }
 .bg-gradient-to-r {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
@@ -1837,18 +1807,6 @@ video {
 .text-white\/70 {
   color: rgb(255 255 255 / 0.7);
 }
-.text-\[var\(--text-primary\)\] {
-  color: var(--text-primary);
-}
-.text-\[var\(--timer-text\)\] {
-  color: var(--timer-text);
-}
-.text-\[var\(--text-secondary\)\] {
-  color: var(--text-secondary);
-}
-.text-\[var\(--todo-text\)\] {
-  color: var(--todo-text);
-}
 .line-through {
   text-decoration-line: line-through;
 }
@@ -1860,12 +1818,6 @@ video {
 }
 .placeholder-purple-300\/50::placeholder {
   color: rgb(216 180 254 / 0.5);
-}
-.placeholder-\[var\(--text-secondary\)\]::-moz-placeholder {
-  color: var(--text-secondary);
-}
-.placeholder-\[var\(--text-secondary\)\]::placeholder {
-  color: var(--text-secondary);
 }
 .opacity-0 {
   opacity: 0;
@@ -2023,35 +1975,27 @@ video {
 }
 
 /* Blue Dark Theme */
-.theme-blue-dark {
+.theme-grey-dark {
   --background: #1e3a8a;
   --text-primary: #fff;
-  --text-secondary: #93c5fd;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
+  --text-secondary: rgb(255 255 255 / 70);
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
   --border: rgb(59 130 246 / 20);
-  --card-bg: rgb(30 64 175 / 80);
-  --glow-color: rgb(30 58 138 / 50);
+  --card-bg: #1e40af;
+  --glow-color: rgba(0,123,255,0.15);
   --highlight: #60a5fa;
   --highlight-hover: #93c5fd;
   --gradient-from: #60a5fa;
-  --gradient-to: #2563eb;
-  --feature-icon: #3b82f6;
+  --gradient-to: #4f46e5;
+  --feature-icon: #6366f1;
   --feature-header: #93c5fd;
   --feature-text: #bfdbfe;
-  --nav-bg: #1e40af;
+  --nav-bg: #1e3a8a;
   --nav-border: rgb(59 130 246 / 20);
-  --nav-text: #93c5fd;
-  --nav-text-hover: #bfdbfe;
-  --spotlight: rgb(30 58 138 / 30);
-  --progress-bg: #1e40af;
-  --progress-fill: #3b82f6;
-  --timer-bg: rgb(30 64 175 / 80);
-  --timer-text: #bfdbfe;
-  --timer-accent: #3b82f6;
-  --todo-bg: rgb(30 64 175 / 80);
-  --todo-text: #bfdbfe;
-  --todo-border: rgb(59 130 246 / 20);
+  --nav-text: rgb(255 255 255 / 70);
+  --nav-text-hover: #fff;
+  --spotlight: rgb(59 130 246 / 10);
 }
 
 /* Pink Dark Theme */
@@ -2249,9 +2193,6 @@ body {
 .hover\:border-blue-500\/50:hover {
   border-color: rgb(59 130 246 / 0.5);
 }
-.hover\:border-\[var\(--accent\)\]:hover {
-  border-color: var(--accent);
-}
 .hover\:bg-accent:hover {
   background-color: hsl(var(--accent));
 }
@@ -2323,12 +2264,6 @@ body {
 .hover\:bg-secondary\/80:hover {
   background-color: hsl(var(--secondary) / 0.8);
 }
-.hover\:bg-\[var\(--accent-hover\)\]:hover {
-  background-color: var(--accent-hover);
-}
-.hover\:bg-\[var\(--card-bg\)\]:hover {
-  background-color: var(--card-bg);
-}
 .hover\:text-accent-foreground:hover {
   color: hsl(var(--accent-foreground));
 }
@@ -2353,9 +2288,6 @@ body {
 .hover\:text-primary-foreground:hover {
   color: hsl(var(--primary-foreground));
 }
-.hover\:text-\[var\(--accent\)\]:hover {
-  color: var(--accent);
-}
 .hover\:underline:hover {
   text-decoration-line: underline;
 }
@@ -2373,9 +2305,6 @@ body {
 }
 .focus\:border-purple-500\/50:focus {
   border-color: rgb(168 85 247 / 0.5);
-}
-.focus\:border-\[var\(--accent\)\]:focus {
-  border-color: var(--accent);
 }
 .focus\:bg-accent:focus {
   background-color: hsl(var(--accent));

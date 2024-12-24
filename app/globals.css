@@ -14,35 +14,27 @@
 }
 
 /* Blue Dark Theme */
-.theme-blue-dark {
+.theme-grey-dark {
   --background: theme('colors.blue.900');
   --text-primary: theme('colors.white');
-  --text-secondary: theme('colors.blue.300');
-  --accent: theme('colors.blue.500');
-  --accent-hover: theme('colors.blue.600');
+  --text-secondary: theme('colors.white/70');
+  --accent: theme('colors.blue.600');
+  --accent-hover: theme('colors.blue.700');
   --border: theme('colors.blue.500/20');
-  --card-bg: theme('colors.blue.800/80');
-  --glow-color: theme('colors.blue.900/50');
+  --card-bg: theme('colors.blue.800');
+  --glow-color: rgba(0,123,255,0.15);
   --highlight: theme('colors.blue.400');
   --highlight-hover: theme('colors.blue.300');
   --gradient-from: theme('colors.blue.400');
-  --gradient-to: theme('colors.blue.600');
-  --feature-icon: theme('colors.blue.500');
+  --gradient-to: theme('colors.indigo.600');
+  --feature-icon: theme('colors.indigo.500');
   --feature-header: theme('colors.blue.300');
   --feature-text: theme('colors.blue.200');
-  --nav-bg: theme('colors.blue.800');
+  --nav-bg: theme('colors.blue.900');
   --nav-border: theme('colors.blue.500/20');
-  --nav-text: theme('colors.blue.300');
-  --nav-text-hover: theme('colors.blue.200');
-  --spotlight: theme('colors.blue.900/30');
-  --progress-bg: theme('colors.blue.800');
-  --progress-fill: theme('colors.blue.500');
-  --timer-bg: theme('colors.blue.800/80');
-  --timer-text: theme('colors.blue.200');
-  --timer-accent: theme('colors.blue.500');
-  --todo-bg: theme('colors.blue.800/80');
-  --todo-text: theme('colors.blue.200');
-  --todo-border: theme('colors.blue.500/20');
+  --nav-text: theme('colors.white/70');
+  --nav-text-hover: theme('colors.white');
+  --spotlight: theme('colors.blue.500/10');
 }
 
 /* Pink Dark Theme */
