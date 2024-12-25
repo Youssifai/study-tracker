@@ -2,6 +2,7 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from './providers/auth-provider';
 import { ThemeProvider } from './providers/theme-provider';
+import PageTransition from './components/PageTransition';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider>
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </ThemeProvider>
         </AuthProvider>
       </body>

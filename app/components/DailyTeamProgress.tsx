@@ -36,11 +36,6 @@ export default function DailyTeamProgress() {
 
   useEffect(() => {
     fetchDailyProgress();
-
-    // Set up polling for real-time updates
-    const interval = setInterval(fetchDailyProgress, 10000); // Poll every 10 seconds
-
-    return () => clearInterval(interval);
   }, []);
 
   const fetchDailyProgress = async () => {
@@ -112,22 +107,27 @@ export default function DailyTeamProgress() {
                       theme === 'blue-dark' ? 'text-[rgb(111,142,255)]/50' : 'text-purple-400'
                     }`} />
                   )}
-                  <span
-                    className={
-                      todo.completed
-                        ? `line-through ${theme === 'blue-dark' ? 'text-[#6b8bfb]/50' : 'text-purple-400'}`
-                        : theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-300'
-                    }
-                  >
-                    {todo.title}
-                    {(todo.course || todo.tag) && (
-                      <span className="ml-2 text-xs opacity-70">
-                        {todo.course?.name}
-                        {todo.course && todo.tag && " • "}
-                        {todo.tag && `#${todo.tag}`}
-                      </span>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={
+                        todo.completed
+                          ? `line-through ${theme === 'blue-dark' ? 'text-[#6b8bfb]/50' : 'text-purple-400'}`
+                          : theme === 'blue-dark' ? 'text-[#6b8bfb]' : 'text-purple-300'
+                      }
+                    >
+                      {todo.title}
+                      {(todo.tag) && (
+                        <span className="ml-2 text-xs opacity-70">
+                          #{todo.tag}
+                        </span>
+                      )}
+                    </span>
+                    {todo.completed && (
+                      <Check className={`w-4 h-4 ${
+                        theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-pink-500'
+                      }`} />
                     )}
-                  </span>
+                  </div>
                 </li>
               ))}
             </ul>

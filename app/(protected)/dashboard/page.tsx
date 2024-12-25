@@ -25,6 +25,9 @@ export default function DashboardPage() {
         setHasGroup(!!data?.id);
       } catch (error) {
         console.error('Error checking group:', error);
+        setHasGroup(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -77,10 +80,10 @@ export default function DashboardPage() {
           Welcome back, {session?.user?.name}!
         </h1>
 
-        {/* Group Section at Top - Only show if not logged in */}
-        {!session?.user && (
-          <div className={`mb-8 bg-black rounded-xl border ${cardBorderClass} p-4 ${shadowClass} backdrop-blur-sm`}>
-            {hasGroup ? <GroupBar /> : <GroupActions />}
+        {/* Group Section at Top - Show if user has no group */}
+        {!hasGroup && session?.user && (
+          <div className={`mb-8 bg-black/40 rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
+            <GroupActions />
           </div>
         )}
 
