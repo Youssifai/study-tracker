@@ -105,9 +105,15 @@ export default function GroupPage() {
     try {
       const response = await fetch(`/api/groups/${params.id}/leave`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: session?.user?.id })
       });
 
       if (!response.ok) throw new Error('Failed to leave group');
+      
+      toast.success('Successfully left the group');
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Error leaving group:', error);

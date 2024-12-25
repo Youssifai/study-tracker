@@ -76,9 +76,9 @@ export default function DashboardPage() {
 
       <div className="relative max-w-7xl mx-auto p-8">
         {/* Welcome Message */}
-        <h1 className={`text-3xl font-bold mb-8 ${headerTextClass}`}>
-          Welcome back, {session?.user?.name}!
-        </h1>
+        <div>
+          <h1 className="text-2xl font-semibold text-blue-400">Home OS</h1>
+        </div>
 
         {/* Group Section at Top - Show if user has no group */}
         {!hasGroup && session?.user && (

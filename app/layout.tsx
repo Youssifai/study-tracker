@@ -1,8 +1,8 @@
-import './globals.css';
 import { Inter } from 'next/font/google';
-import { AuthProvider } from './providers/auth-provider';
+import './globals.css';
 import { ThemeProvider } from './providers/theme-provider';
-import PageTransition from './components/PageTransition';
+import { Toaster } from 'sonner';
+import ClientLayout from './client-layout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,15 +17,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <ThemeProvider>
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </ThemeProvider>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="blue-dark"
+          enableSystem={false}
+          themes={['blue-dark', 'purple-dark']}
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen bg-[#020817] flex flex-col">
+            <main className="flex-1">
+              <Toaster richColors position="top-center" />
+              <ClientLayout>{children}</ClientLayout>
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

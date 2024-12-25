@@ -52,15 +52,16 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-[#020817] relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-indigo-500/20" />
+      <div className="max-w-md w-full space-y-8 p-8 bg-blue-900/20 backdrop-blur-sm border border-blue-500/20 rounded-lg relative">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-600">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-blue-200">
             Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-500">
+            <Link href="/login" className="text-blue-400 hover:text-blue-300">
               Sign in
             </Link>
           </p>
@@ -68,8 +69,8 @@ export default function SignUpPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+              <label htmlFor="name" className="block text-sm font-medium text-blue-200">
+                First Name
               </label>
               <input
                 id="name"
@@ -78,11 +79,11 @@ export default function SignUpPage() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md bg-blue-950/50 border-blue-500/20 text-white placeholder-blue-300/50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-blue-200">
                 Email address
               </label>
               <input
@@ -92,11 +93,11 @@ export default function SignUpPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md bg-blue-950/50 border-blue-500/20 text-white placeholder-blue-300/50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-blue-200">
                 Password
               </label>
               <input
@@ -106,11 +107,11 @@ export default function SignUpPage() {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md bg-blue-950/50 border-blue-500/20 text-white placeholder-blue-300/50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-blue-200">
                 Confirm Password
               </label>
               <input
@@ -120,7 +121,7 @@ export default function SignUpPage() {
                 required
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md bg-blue-950/50 border-blue-500/20 text-white placeholder-blue-300/50 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
