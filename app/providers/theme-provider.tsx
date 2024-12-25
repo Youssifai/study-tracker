@@ -14,7 +14,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('pink-dark');
+  const [theme, setTheme] = useState<Theme>('blue-dark');
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -37,6 +37,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     // Save to localStorage
     localStorage.setItem('theme', theme);
+
+    // Update data-theme attribute for better CSS support
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme, mounted]);
 
   const value = {
@@ -49,7 +52,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Prevent SSR flash
   if (!mounted) return null;
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
@@ -58,4 +65,4 @@ export function useTheme() {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
-} 
+}

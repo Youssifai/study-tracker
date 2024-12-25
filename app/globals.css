@@ -2,160 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Blue Dark Theme */
-.theme-blue-dark {
-  --background: theme('colors.blue.900');
-  --text-primary: rgb(111, 142, 255);
-  --text-secondary: theme('colors.white/70');
-  --accent: theme('colors.blue.600');
-  --accent-hover: theme('colors.blue.700');
-  --border: theme('colors.blue.500/20');
-  --card-bg: theme('colors.blue.800');
-  --glow-color: rgba(41, 58, 247, 0.2);
-  --highlight: theme('colors.blue.400');
-  --highlight-hover: theme('colors.blue.300');
-  --gradient-from: theme('colors.blue.400');
-  --gradient-to: theme('colors.blue.600');
-  --nav-bg: rgb(8, 14, 25);
-  --nav-border: theme('colors.blue.500/20');
-  --nav-text: theme('colors.white');
-  --nav-text-hover: theme('colors.white');
-  --progress-bg: theme('colors.blue.900/40');
-  --progress-fill: theme('colors.blue.600');
-  --button-bg: theme('colors.blue.600');
-  --button-hover: theme('colors.blue.700');
-  --button-text: theme('colors.white');
-  --input-bg: theme('colors.blue.900/40');
-  --input-border: theme('colors.blue.500/20');
-  --input-text: theme('colors.white');
-  --input-placeholder: theme('colors.blue.300/50');
+@layer base {
+  :root {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 0.75rem;
+  }
 }
 
-/* Pink Dark Theme */
-.theme-pink-dark {
-  --background: theme('colors.black');
-  --text-primary: theme('colors.white');
-  --text-secondary: theme('colors.purple.300');
-  --accent: theme('colors.pink.500');
-  --accent-hover: theme('colors.pink.600');
-  --border: theme('colors.purple.500/20');
-  --card-bg: theme('colors.black/40');
-  --glow-color: theme('colors.purple.600/20');
-  --highlight: theme('colors.pink.500');
-  --highlight-hover: theme('colors.pink.400');
-  --gradient-from: theme('colors.purple.400');
-  --gradient-to: theme('colors.pink.600');
-  --nav-bg: theme('colors.black/40');
-  --nav-border: theme('colors.purple.500/20');
-  --nav-text: theme('colors.purple.300');
-  --nav-text-hover: theme('colors.pink.500');
-  --progress-bg: theme('colors.purple.500/20');
-  --progress-fill: theme('colors.pink.500');
-  --button-bg: theme('colors.pink.500');
-  --button-hover: theme('colors.pink.600');
-  --button-text: theme('colors.white');
-  --input-bg: theme('colors.black/40');
-  --input-border: theme('colors.purple.500/20');
-  --input-text: theme('colors.white');
-  --input-placeholder: theme('colors.purple.300/50');
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply text-3xl font-bold mb-6;
+  }
+  h2 {
+    @apply text-2xl font-semibold mb-4;
+  }
+  h3 {
+    @apply text-xl font-semibold mb-3;
+  }
+  p {
+    @apply mb-4;
+  }
+  section {
+    @apply mb-8;
+  }
 }
 
-/* Apply theme variables */
-body {
-  background-color: var(--background);
-  color: var(--text-primary);
-}
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
 
-/* Common button styles */
-.btn {
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  transition: all 0.2s;
-}
+  .page-header {
+    @apply py-6 mb-8;
+  }
 
-.btn:hover {
-  background-color: var(--button-hover);
-}
+  .page-title {
+    @apply text-3xl font-bold text-blue-400;
+  }
 
-/* Common border styles */
-.border-themed {
-  border-color: var(--border);
-}
+  .page-description {
+    @apply mt-2 text-blue-200/80;
+  }
 
-/* Card styles */
-.card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(8px);
-}
+  .section-header {
+    @apply flex items-center justify-between mb-6;
+  }
 
-/* Accent text */
-.text-accent {
-  color: var(--accent);
-}
+  .section-title {
+    @apply text-2xl font-semibold text-blue-400;
+  }
 
-/* Accent background */
-.bg-accent {
-  background-color: var(--accent);
-}
+  .card {
+    @apply bg-blue-900/20 backdrop-blur-sm border border-blue-500/20 rounded-lg p-6;
+  }
 
-/* Secondary text */
-.text-secondary {
-  color: var(--text-secondary);
-}
+  .card-header {
+    @apply flex items-center justify-between mb-4;
+  }
 
-/* Glow effects */
-.glow {
-  box-shadow: 0 0 15px var(--glow-color);
-}
+  .card-title {
+    @apply text-xl font-semibold text-blue-400;
+  }
 
-/* Highlight text */
-.text-highlight {
-  color: var(--highlight);
-}
+  .form-group {
+    @apply mb-4;
+  }
 
-.text-highlight:hover {
-  color: var(--highlight-hover);
-}
+  .form-label {
+    @apply block text-sm font-medium text-blue-200 mb-1;
+  }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(to right, var(--gradient-from), var(--gradient-to));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .form-input {
+    @apply w-full rounded-md bg-blue-950/50 border-blue-500/20 text-white placeholder-blue-300/50 focus:border-blue-500 focus:ring-blue-500;
+  }
 
-/* Navigation styles */
-.nav {
-  background-color: var(--nav-bg);
-  border-color: var(--nav-border);
-}
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  }
 
-.nav-text {
-  color: var(--nav-text);
-}
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
 
-.nav-text:hover {
-  color: var(--nav-text-hover);
-}
+  .btn-secondary {
+    @apply bg-blue-900/40 text-blue-200 hover:bg-blue-900/60 border border-blue-500/20;
+  }
 
-/* Input styles */
-.input {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--input-text);
-}
-
-.input::placeholder {
-  color: var(--input-placeholder);
-}
-
-/* Progress bar styles */
-.progress-bar {
-  background-color: var(--progress-bg);
-}
-
-.progress-fill {
-  background-color: var(--progress-fill);
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+  }
 }

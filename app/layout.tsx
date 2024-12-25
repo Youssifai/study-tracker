@@ -19,13 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="blue-dark"
-          enableSystem={false}
-          themes={['blue-dark', 'purple-dark']}
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <div className="min-h-screen bg-[#020817] flex flex-col">
             <main className="flex-1">
               <Toaster richColors position="top-center" />
