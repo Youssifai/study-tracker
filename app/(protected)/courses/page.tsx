@@ -5,6 +5,7 @@ import { Plus, Book, Pencil, Trash2, Calendar, GraduationCap } from 'lucide-reac
 import { useSession } from 'next-auth/react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/app/providers/theme-provider';
 
 interface Course {
   id: string;
@@ -26,8 +27,33 @@ export default function CoursesPage() {
     examDate: '',
   });
   const { data: session } = useSession();
-  const theme = session?.user?.theme;
+  const { theme } = useTheme();
   const router = useRouter();
+
+  // Theme-specific classes
+  const glowEffect = theme === 'blue-dark' 
+    ? "bg-[rgba(41,58,247,0.2)]" 
+    : "bg-purple-600/20";
+
+  const headerTextClass = theme === 'blue-dark'
+    ? "text-[rgb(111,142,255)]"
+    : "text-purple-300";
+
+  const cardBorderClass = theme === 'blue-dark'
+    ? "border-[rgb(111,142,255)]/20"
+    : "border-purple-500/20";
+
+  const buttonClass = theme === 'blue-dark'
+    ? "bg-[rgb(111,142,255)] hover:bg-[rgb(111,142,255)]/90"
+    : "bg-pink-500 hover:bg-pink-600";
+
+  const iconClass = theme === 'blue-dark'
+    ? "text-[rgb(111,142,255)]"
+    : "text-purple-400";
+
+  const shadowClass = theme === 'blue-dark'
+    ? "shadow-[0_0_15px_rgba(41,58,247,0.2)]"
+    : "shadow-[0_0_15px_rgba(168,85,247,0.15)]";
 
   useEffect(() => {
     fetchCourses();
@@ -119,27 +145,15 @@ export default function CoursesPage() {
   return (
     <div className="relative min-h-screen bg-black">
       {/* Background Glow Effect */}
-      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] ${
-        theme === 'blue-dark' 
-          ? 'bg-[rgba(41,58,247,0.2)]' 
-          : 'bg-purple-600/20'
-      } blur-[120px] rounded-full pointer-events-none`} />
+      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] ${glowEffect} blur-[120px] rounded-full pointer-events-none`} />
 
       <div className="relative max-w-7xl mx-auto p-8">
         {/* Header */}
-        <div className={`p-6 rounded-lg border backdrop-blur-sm bg-black ${
-          theme === 'blue-dark'
-            ? 'border-[rgb(111,142,255)]/20'
-            : 'border-purple-500/20'
-        }`}>
+        <div className={`p-6 rounded-lg border backdrop-blur-sm bg-black/40 ${cardBorderClass} ${shadowClass}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <GraduationCap className={
-                theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-400'
-              } />
-              <h1 className={`text-xl font-semibold ${
-                theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-              }`}>
+              <GraduationCap className={iconClass} />
+              <h1 className={`text-xl font-semibold ${headerTextClass}`}>
                 Your Courses
               </h1>
             </div>
@@ -149,11 +163,7 @@ export default function CoursesPage() {
                 setFormData({ name: '', description: '', examDate: '' });
                 setIsModalOpen(true);
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-colors ${
-                theme === 'blue-dark'
-                  ? 'bg-[rgb(111,142,255)] hover:bg-[rgb(111,142,255)]/90'
-                  : 'bg-pink-500 hover:bg-pink-600'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-colors ${buttonClass}`}
             >
               <Plus size={20} />
               Add Course
@@ -166,74 +176,40 @@ export default function CoursesPage() {
           {courses.map((course) => (
             <div
               key={course.id}
-              className={`p-6 rounded-lg border backdrop-blur-sm bg-black ${
-                theme === 'blue-dark'
-                  ? 'border-[rgb(111,142,255)]/20'
-                  : 'border-purple-500/20'
-              }`}
+              className={`p-6 rounded-lg border backdrop-blur-sm bg-black/40 ${cardBorderClass} ${shadowClass}`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <Book className={
-                    theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-                  } />
-                  <h3 className={`text-lg font-semibold ${
-                    theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-                  }`}>
+                  <Book className={iconClass} />
+                  <h3 className={`text-lg font-semibold ${headerTextClass}`}>
                     {course.name}
                   </h3>
                 </div>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      setEditingCourse(course);
-                      setFormData({
-                        name: course.name,
-                        description: course.description || '',
-                        examDate: course.examDate || '',
-                      });
-                      setIsModalOpen(true);
-                    }}
-                    className={`p-1 transition-colors ${
-                      theme === 'blue-dark'
-                        ? 'text-[rgb(111,142,255)]/70 hover:text-[rgb(111,142,255)]'
-                        : 'text-purple-300/70 hover:text-purple-300'
-                    }`}
+                    onClick={() => handleEdit(course)}
+                    className={`p-1 transition-colors hover:${iconClass}`}
                   >
-                    <Pencil size={16} />
+                    <Pencil size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(course.id)}
-                    className={`p-1 transition-colors ${
-                      theme === 'blue-dark'
-                        ? 'text-[rgb(111,142,255)]/70 hover:text-[rgb(111,142,255)]'
-                        : 'text-purple-300/70 hover:text-purple-300'
-                    }`}
+                    className={`p-1 transition-colors hover:${iconClass}`}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               </div>
 
               {course.description && (
-                <p className={`mt-2 text-sm ${
-                  theme === 'blue-dark'
-                    ? 'text-[rgb(111,142,255)]/70'
-                    : 'text-purple-300/70'
-                }`}>
+                <p className={`mt-2 text-sm ${headerTextClass}/70`}>
                   {course.description}
                 </p>
               )}
 
               {course.examDate && (
-                <div className={`mt-3 flex items-center gap-2 text-sm ${
-                  theme === 'blue-dark'
-                    ? 'text-[rgb(111,142,255)]/70'
-                    : 'text-purple-300/70'
-                }`}>
-                  <Calendar className={
-                    theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-                  } />
+                <div className={`mt-3 flex items-center gap-2 text-sm ${headerTextClass}/70`}>
+                  <Calendar className={iconClass} />
                   <span>
                     Exam in {calculateDaysUntilExam(course.examDate)} days ({new Date(course.examDate).toLocaleDateString()})
                   </span>
@@ -243,11 +219,7 @@ export default function CoursesPage() {
               <div className="mt-4">
                 <button
                   onClick={() => router.push(`/courses/${course.id}`)}
-                  className={`w-full px-4 py-2 rounded-lg text-white transition-colors ${
-                    theme === 'blue-dark'
-                      ? 'bg-[rgb(111,142,255)] hover:bg-[rgb(111,142,255)]/90'
-                      : 'bg-pink-500 hover:bg-pink-600'
-                  }`}
+                  className={`w-full px-4 py-2 rounded-lg text-white transition-colors ${buttonClass}`}
                 >
                   View Details
                 </button>
@@ -260,14 +232,8 @@ export default function CoursesPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className={`p-6 rounded-lg border backdrop-blur-sm bg-black w-[90%] max-w-md ${
-            theme === 'blue-dark'
-              ? 'border-[rgb(111,142,255)]/20'
-              : 'border-purple-500/20'
-          }`}>
-            <h2 className={`text-xl font-semibold mb-4 ${
-              theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-            }`}>
+          <div className={`p-6 rounded-lg border backdrop-blur-sm bg-black/40 w-[90%] max-w-md ${cardBorderClass} ${shadowClass}`}>
+            <h2 className={`text-xl font-semibold mb-4 ${headerTextClass}`}>
               {editingCourse ? 'Edit Course' : 'Add New Course'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -276,31 +242,19 @@ export default function CoursesPage() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Course name"
-                className={`w-full px-3 py-2 bg-black border rounded-lg text-white placeholder-white/50 focus:outline-none ${
-                  theme === 'blue-dark'
-                    ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(111,142,255)]/50'
-                    : 'border-purple-500/20 focus:border-purple-500/50'
-                }`}
+                className={`w-full px-3 py-2 bg-black border rounded-lg text-white placeholder-white/50 focus:outline-none ${cardBorderClass}`}
               />
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Course description (optional)"
-                className={`w-full px-3 py-2 bg-black border rounded-lg text-white placeholder-white/50 focus:outline-none min-h-[100px] ${
-                  theme === 'blue-dark'
-                    ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(111,142,255)]/50'
-                    : 'border-purple-500/20 focus:border-purple-500/50'
-                }`}
+                className={`w-full px-3 py-2 bg-black border rounded-lg text-white placeholder-white/50 focus:outline-none min-h-[100px] ${cardBorderClass}`}
               />
               <input
                 type="date"
                 value={formData.examDate}
                 onChange={(e) => setFormData({ ...formData, examDate: e.target.value })}
-                className={`w-full px-3 py-2 bg-black border rounded-lg text-white focus:outline-none ${
-                  theme === 'blue-dark'
-                    ? 'border-[rgb(111,142,255)]/20 focus:border-[rgb(111,142,255)]/50'
-                    : 'border-purple-500/20 focus:border-purple-500/50'
-                }`}
+                className={`w-full px-3 py-2 bg-black border rounded-lg text-white focus:outline-none ${cardBorderClass}`}
               />
               <div className="flex justify-end gap-3">
                 <button
@@ -310,21 +264,13 @@ export default function CoursesPage() {
                     setEditingCourse(null);
                     setFormData({ name: '', description: '', examDate: '' });
                   }}
-                  className={`px-4 py-2 transition-colors ${
-                    theme === 'blue-dark'
-                      ? 'text-[rgb(111,142,255)]/70 hover:text-[rgb(111,142,255)]'
-                      : 'text-purple-300/70 hover:text-purple-300'
-                  }`}
+                  className={`px-4 py-2 transition-colors ${headerTextClass}/70 hover:${headerTextClass}`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                    theme === 'blue-dark'
-                      ? 'bg-[rgb(111,142,255)] hover:bg-[rgb(111,142,255)]/90'
-                      : 'bg-pink-500 hover:bg-pink-600'
-                  }`}
+                  className={`px-4 py-2 text-white rounded-lg transition-colors ${buttonClass}`}
                 >
                   {editingCourse ? 'Save Changes' : 'Add Course'}
                 </button>
