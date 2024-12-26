@@ -1,9 +1,17 @@
 {
   "/not-found": "app/not-found.js",
-  "/signup/page": "app/signup/page.js",
+  "/api/todos/route": "app/api/todos/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/courses/route": "app/api/courses/route.js",
+  "/api/statistics/daily/route": "app/api/statistics/daily/route.js",
+  "/api/groups/route": "app/api/groups/route.js",
+  "/api/statistics/weekly/route": "app/api/statistics/weekly/route.js",
+  "/api/groups/[id]/route": "app/api/groups/[id]/route.js",
+  "/api/groups/[id]/stats/route": "app/api/groups/[id]/stats/route.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/todos/daily/route": "app/api/todos/daily/route.js",
   "/(protected)/courses/page": "app/(protected)/courses/page.js",
+  "/(protected)/group/[id]/page": "app/(protected)/group/[id]/page.js",
   "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js"
 }
