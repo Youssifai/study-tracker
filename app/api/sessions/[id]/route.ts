@@ -20,6 +20,10 @@ export async function PATCH(
       );
     }
 
+    // Parse request body
+    const body = await request.json();
+    const { isPaused, totalPausedTime, pausedAt, endTime, isCompleted } = body;
+
     // Find the study session
     const studySession = await prisma.session.findUnique({
       where: { id: params.id },
@@ -40,23 +44,39 @@ export async function PATCH(
       );
     }
 
-    const endTime = new Date();
-    const totalMinutes = Math.round(
-      (endTime.getTime() - studySession.startTime.getTime()) / (1000 * 60)
-    );
+    // Prepare update data
+    const updateData: any = {};
 
-    // Update the session with end time and total time
+    // Handle pause state
+    if (typeof isPaused === 'boolean') {
+      updateData.isPaused = isPaused;
+      updateData.pausedAt = isPaused ? pausedAt : null;
+    }
+
+    // Handle total paused time
+    if (typeof totalPausedTime === 'number') {
+      updateData.totalPausedTime = totalPausedTime;
+    }
+
+    // Handle session completion
+    if (isCompleted) {
+      const sessionEndTime = endTime ? new Date(endTime) : new Date();
+      updateData.endTime = sessionEndTime;
+      
+      // Calculate total active time (excluding pauses)
+      const totalDuration = Math.floor(
+        (sessionEndTime.getTime() - studySession.startTime.getTime() - (totalPausedTime || 0)) / (1000 * 60)
+      );
+      updateData.totalTime = Math.max(0, totalDuration);
+    }
+
+    // Update the session
     const updatedSession = await prisma.session.update({
       where: { id: params.id },
-      data: {
-        endTime,
-        totalTime: totalMinutes,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({
-      totalTime: totalMinutes,
-      unit: "minutes",
       session: updatedSession,
     });
 
@@ -67,4 +87,4 @@ export async function PATCH(
       { status: 500 }
     );
   }
-} 
+}

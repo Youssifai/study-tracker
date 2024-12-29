@@ -10,6 +10,7 @@ import StudyProgress from '@/app/components/StudyProgress';
 import DailyTeamProgress from '@/app/components/DailyTeamProgress';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import PersistentStudyTimer from '@/app/components/PersistentStudyTimer';
+import PageTransition from '@/app/components/PageTransition';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -36,18 +37,9 @@ export default function DashboardPage() {
     }
   }, [session]);
 
-  useEffect(() => {
-    if (status !== 'loading') {
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
-
-  if (isLoading) {
+  if (status === 'loading' || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[rgb(8,14,25)]">
+      <div className="flex items-center justify-center min-h-screen bg-black">
         <LoadingSpinner />
       </div>
     );
@@ -70,58 +62,60 @@ export default function DashboardPage() {
     : "shadow-[0_0_15px_rgba(168,85,247,0.15)]";
 
   return (
-    <div className="relative min-h-screen bg-black">
-      {/* Background Glow Effect */}
-      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] ${glowEffect} blur-[120px] rounded-full pointer-events-none`} />
+    <PageTransition>
+      <div className="relative min-h-screen bg-black">
+        {/* Background Glow Effect */}
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] ${glowEffect} blur-[120px] rounded-full pointer-events-none`} />
 
-      <div className="relative max-w-7xl mx-auto px-8">
-        {/* Welcome Message */}
-        <div className="pt-9 pb-7">
-          <h1 className={`text-2xl font-semibold ${headerTextClass}`}>Home OS</h1>
-        </div>
-
-        {/* Group Section at Top - Show if user has no group */}
-        {!hasGroup && session?.user && (
-          <div className={`mb-8 bg-black/40 rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
-            <GroupActions />
-          </div>
-        )}
-
-        {/* Two Column Layout for Tasks and Progress */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column - Timer and Tasks */}
-          <div className="space-y-8">
-            {/* Timer Section */}
-            <div className={shadowClass}>
-              <PersistentStudyTimer />
-            </div>
-
-            {/* Tasks Section */}
-            <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
-              <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
-                Your Tasks
-              </h2>
-              <TodoList />
-            </div>
+        <div className="relative max-w-7xl mx-auto px-8">
+          {/* Welcome Message */}
+          <div className="pt-9 pb-7">
+            <h1 className={`text-2xl font-semibold ${headerTextClass}`}>Home OS</h1>
           </div>
 
-          {/* Right Column - Study Progress */}
-          <div className="space-y-8">
-            <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
-              <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
-                Study Progress
-              </h2>
-              <StudyProgress />
+          {/* Group Section at Top - Show if user has no group */}
+          {!hasGroup && session?.user && (
+            <div className={`mb-8 bg-black/40 rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
+              <GroupActions />
             </div>
-            <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
-              <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
-                Today's Team Progress
-              </h2>
-              <DailyTeamProgress />
+          )}
+
+          {/* Two Column Layout for Tasks and Progress */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Left Column - Timer and Tasks */}
+            <div className="space-y-8">
+              {/* Timer Section */}
+              <div className={shadowClass}>
+                <PersistentStudyTimer />
+              </div>
+
+              {/* Tasks Section */}
+              <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
+                <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
+                  Your Tasks
+                </h2>
+                <TodoList />
+              </div>
+            </div>
+
+            {/* Right Column - Study Progress */}
+            <div className="space-y-8">
+              <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
+                <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
+                  Study Progress
+                </h2>
+                <StudyProgress />
+              </div>
+              <div className={`bg-black rounded-xl border ${cardBorderClass} p-6 ${shadowClass} backdrop-blur-sm`}>
+                <h2 className={`text-xl font-semibold mb-6 ${headerTextClass}`}>
+                  Today's Team Progress
+                </h2>
+                <DailyTeamProgress />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
-} 
+}

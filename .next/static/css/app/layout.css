@@ -939,6 +939,9 @@ video {
 .min-h-screen {
   min-height: 100vh;
 }
+.min-h-\[50vh\] {
+  min-height: 50vh;
+}
 .w-0 {
   width: 0px;
 }
@@ -3051,6 +3054,10 @@ video {
 }
 
 @media (min-width: 1024px) {
+
+  .lg\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
 
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
