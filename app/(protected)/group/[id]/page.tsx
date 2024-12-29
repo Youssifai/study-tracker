@@ -314,63 +314,37 @@ export default function GroupPage() {
               ? 'border-[rgb(111,142,255)]/20 shadow-[0_0_15px_rgba(111,142,255,0.15)]'
               : 'border-purple-500/20 shadow-[0_0_15px_rgba(147,51,234,0.15)]'
           }`}>
-            <div className="flex items-center gap-3 mb-6">
-              <Users className={
-                theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-400'
-              } />
-              <h2 className={`text-xl font-semibold ${
-                theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-              }`}>
-                Group Members
-              </h2>
-            </div>
-            <div className="grid gap-4">
+            <h2 className={`text-xl font-semibold ${
+              theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
+            }`}>
+              Group Members
+            </h2>
+            <div className="space-y-4">
               {group.members.map((member) => (
                 <div
                   key={member.id}
-                  className={`flex items-center justify-between p-4 bg-black/40 border rounded-lg group ${
+                  className={`flex items-center justify-between p-4 bg-black/40 border rounded-lg ${
                     theme === 'blue-dark'
                       ? 'border-[rgb(111,142,255)]/20'
                       : 'border-purple-500/20'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {member.image ? (
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-10 h-10 rounded-full"
-                      />
-                    ) : (
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        theme === 'blue-dark'
-                          ? 'bg-[rgb(111,142,255)]/30'
-                          : 'bg-purple-500/30'
-                      }`}>
-                        <span className={
-                          theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-                        }>
-                          {member.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                    <span className={
+                      theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
+                    }>
+                      {member.name}
+                    </span>
+                    {member.id === group.ownerId && (
+                      <Crown className={
+                        theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-pink-500'
+                      } />
                     )}
-                    <div className="flex items-center gap-2">
-                      <h3 className={`font-medium ${
-                        theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-purple-300'
-                      }`}>
-                        {member.name}
-                      </h3>
-                      {member.id === group.ownerId && (
-                        <Crown className={
-                          theme === 'blue-dark' ? 'text-[rgb(111,142,255)]' : 'text-pink-500'
-                        } />
-                      )}
-                    </div>
                   </div>
                   {isOwner && member.id !== group.ownerId && (
                     <button
                       onClick={() => handleKickMember(member.id)}
-                      className={`opacity-0 group-hover:opacity-100 p-1 transition-all ${
+                      className={`opacity-0 group-hover:opacity-100 transition-all ${
                         theme === 'blue-dark'
                           ? 'text-[rgb(111,142,255)]/70 hover:text-[rgb(111,142,255)]'
                           : 'text-purple-400 hover:text-purple-300'
