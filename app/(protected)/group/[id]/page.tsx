@@ -218,11 +218,11 @@ export default function GroupPage() {
                   <button
                     onClick={() => {
                       setIsEditing(false);
-                      setNewGroupName(group?.name);
+                      setNewGroupName(group?.name || '');
                     }}
                     className={`px-3 py-2 transition-colors ${
                       theme === 'blue-dark'
-                        ? 'text-[rgb(111,142,255)] hover:text-[rgb(111,142,255)]/90'
+                        ? 'text-[rgb(111,142,255)]/70 hover:text-[rgb(111,142,255)]'
                         : 'text-purple-400 hover:text-purple-300'
                     }`}
                   >
