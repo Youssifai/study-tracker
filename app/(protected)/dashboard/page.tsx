@@ -58,8 +58,8 @@ export default function DashboardPage() {
     : "bg-purple-600/20";
 
   const headerTextClass = theme === 'blue-dark'
-    ? "text-[rgb(111,142,255)]"
-    : "bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent";
+    ? "text-[rgb(107,140,251)] font-bold"
+    : "bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent font-bold";
 
   const cardBorderClass = theme === 'blue-dark'
     ? "border-[rgb(111,142,255)]/20"
@@ -74,10 +74,10 @@ export default function DashboardPage() {
       {/* Background Glow Effect */}
       <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] ${glowEffect} blur-[120px] rounded-full pointer-events-none`} />
 
-      <div className="relative max-w-7xl mx-auto p-8">
+      <div className="relative max-w-7xl mx-auto px-8">
         {/* Welcome Message */}
-        <div>
-          <h1 className="text-2xl font-semibold text-blue-400">Home OS</h1>
+        <div className="pt-9 pb-7">
+          <h1 className={`text-2xl font-semibold ${headerTextClass}`}>Home OS</h1>
         </div>
 
         {/* Group Section at Top - Show if user has no group */}

@@ -15,9 +15,9 @@ export default function Home() {
       <FloatingNav />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20">
+      <section className="relative pt-0 pb-20">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent" />
-        <div className="container px-4 md:px-6 relative">
+        <div className="container px-4 md:px-6 relative pt-0">
           <div className="flex flex-col items-center text-center space-y-8">
             <AnimatedText
               text="Transform Your Study Habits"
@@ -60,7 +60,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-0">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-16">
             <AnimatedText
@@ -102,7 +102,7 @@ export default function Home() {
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="py-20 relative">
+      <section id="how-it-works" className="py-0 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent" />
         <div className="container px-4 md:px-6 relative">
           <div className="text-center mb-16">
@@ -145,7 +145,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 relative">
+      <section className="py-0 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent" />
         <div className="container px-4 md:px-6 relative">
           <div className="glass-card p-8 md:p-12 rounded-xl text-center max-w-3xl mx-auto bg-blue-900/20 border border-blue-500/20 backdrop-blur-sm">

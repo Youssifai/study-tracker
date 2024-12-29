@@ -334,7 +334,7 @@ export default function GroupPage() {
                       : 'border-purple-500/20'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     {member.image ? (
                       <img
                         src={member.image}

@@ -1,7 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from './providers/theme-provider';
-import { Toaster } from 'sonner';
 import ClientLayout from './client-layout';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -18,11 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased p-0 m-0`}>
         <ThemeProvider>
           <div className="min-h-screen bg-[#020817] flex flex-col">
-            <main className="flex-1">
-              <Toaster richColors position="top-center" />
+            <main className="flex-1 p-0 m-0">
               <ClientLayout>{children}</ClientLayout>
             </main>
           </div>

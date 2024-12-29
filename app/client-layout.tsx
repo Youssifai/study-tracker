@@ -25,7 +25,7 @@ export default function ClientLayout({
   return (
     <SessionProvider>
       {isLoading ? (
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-screen p-0 m-0">
           <LoadingSpinner />
         </div>
       ) : (

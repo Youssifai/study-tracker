@@ -35,7 +35,7 @@
     @apply bg-background text-foreground;
   }
   h1 {
-    @apply text-3xl font-bold mb-6;
+    @apply text-3xl font-bold mb-0;
   }
   h2 {
     @apply text-2xl font-semibold mb-4;

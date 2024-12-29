@@ -10,9 +10,17 @@ import ThemeModal from './ThemeModal';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { setIsThemeModalOpen } = useTheme();
+  const { setIsThemeModalOpen, theme } = useTheme();
   const { data: session } = useSession();
   const [groupId, setGroupId] = useState<string | null>(null);
+
+  const iconColors = {
+    'blue-dark': 'text-[rgb(107,140,251)]',
+    'pink-dark': 'text-purple-500',
+    default: 'text-accent'
+  };
+
+  const currentIconColor = iconColors[theme] || iconColors.default;
 
   useEffect(() => {
     const fetchUserGroup = async () => {
@@ -42,7 +50,7 @@ export default function Sidebar() {
               pathname === '/dashboard' ? 'bg-accent/20' : ''
             }`}
           >
-            <Home className="w-6 h-6 text-accent" />
+            <Home className={`w-6 h-6 ${currentIconColor}`} />
           </Link>
           <Link
             href="/courses"
@@ -50,7 +58,7 @@ export default function Sidebar() {
               pathname === '/courses' ? 'bg-accent/20' : ''
             }`}
           >
-            <BookOpen className="w-6 h-6 text-accent" />
+            <BookOpen className={`w-6 h-6 ${currentIconColor}`} />
           </Link>
           {groupId ? (
             <Link
@@ -60,14 +68,14 @@ export default function Sidebar() {
               }`}
               title="View your group"
             >
-              <Users className="w-6 h-6 text-accent" />
+              <Users className={`w-6 h-6 ${currentIconColor}`} />
             </Link>
           ) : (
             <div
               title="You're not currently in a group. Please join or create one to access this feature."
               className="p-2 rounded-lg cursor-not-allowed opacity-50"
             >
-              <Users className="w-6 h-6 text-accent" />
+              <Users className={`w-6 h-6 ${currentIconColor}`} />
             </div>
           )}
         </div>
@@ -77,14 +85,14 @@ export default function Sidebar() {
             className="p-2 rounded-lg hover:bg-accent/20 transition-colors"
             aria-label="Change theme"
           >
-            <Palette className="w-6 h-6 text-accent" />
+            <Palette className={`w-6 h-6 ${currentIconColor}`} />
           </button>
           <button
             onClick={() => signOut()}
             className="p-2 rounded-lg hover:bg-accent/20 transition-colors"
             aria-label="Sign out"
           >
-            <LogOut className="w-6 h-6 text-accent" />
+            <LogOut className={`w-6 h-6 ${currentIconColor}`} />
           </button>
         </div>
       </div>
